@@ -23,7 +23,10 @@ Template.home.helpers({
     return Items.find({tweeted: true}).count();
   },
   showingItems: function(){
-    var finalPageEntries = Items.find({}, {skip: (itemsPaginator.currentPage.get() - 1) * itemsPaginator.perPage, limit: itemsPaginator.perPage }).count();
+    var finalPageEntries = Items.find({}, {
+      skip: (itemsPaginator.currentPage.get() - 1) * itemsPaginator.perPage,
+      limit: itemsPaginator.perPage
+    }).count();
     var initialEntry = (itemsPaginator.currentPage.get() * itemsPaginator.perPage) - (itemsPaginator.perPage - 1 );
     var finalEntry = initialEntry + finalPageEntries - 1;
     return initialEntry + " - " + finalEntry;
@@ -87,7 +90,17 @@ Template.home.events({
     if ( newValue >= 1 && newValue <= parseInt(e.target.attributes["max"].value, 10)) {
       itemsPaginator.currentPage.set(newValue);
     }
-  }
+  },
+  "click #tweet-items": function (e, t) {
+     var selectedItems = _.map(t.findAll("table tr td input:checked"), function (checkbox) {
+      return {
+        _id: checkbox.value,
+        title: checkbox.dataset.itemTitle,
+        handle: checkbox.dataset.itemHandle
+      };
+    });
+    Meteor.call("tweetItems", selectedItems);
+  },
 });
 
 

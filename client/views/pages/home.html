@@ -2,7 +2,7 @@
   <h1 class="text-center">CGSpace Mass Tweets</h1>
   <div class="row">
     <div class="col-md-3">
-      <div class="panel panel-info">
+      <div class="panel panel-success">
         <div class="panel-heading"><h5>Quick Stats</h5></div>
         <div class="panel-body">
           <p>Total Entries: {{totalItems}}</p>
@@ -32,7 +32,7 @@
           </div>
           <div class="col-md-4 text-right">
             <p>Selected Entries: {{ selectedItemsCount }}</p>
-            <a id="auto-tweet" class="btn btn-primary btn-large" href="#">Tweet</a>
+            <a id="tweet-items" class="btn btn-success btn-large" href="#">Tweet</a>
           </div>
         </div>
       </div>
@@ -81,7 +81,7 @@
   {{#unless alreadyTweeted}}
   <div class="checkbox checkbox-primary">
     <label>
-      <input type="checkbox" name="selectItem" class="item-selected" id="{{_id}}"/>
+      <input type="checkbox" name="selectItem" class="item-selected" value="{{_id}}" data-item-title="{{title}}" data-item-handle="{{handle}}"/>
     </label>
   </div>
   {{/unless}}

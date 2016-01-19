@@ -1,75 +1,88 @@
 <template name="home">
-  <h1>CGSpace Entries</h1>
+  <h1 class="text-center">CGSpace Mass Tweets</h1>
   <div class="row">
     <div class="col-md-3">
-      <p>Total Entries: {{totalItems}}</p>
-      <p>Total Tweets: {{totalTweetedItems}}</p>
-      <!-- <p>Showing: {{showingItems}}</p> -->
+      <div class="panel panel-info">
+        <div class="panel-heading"><h5>Quick Stats</h5></div>
+        <div class="panel-body">
+          <p>Total Entries: {{totalItems}}</p>
+          <p>Total Tweets: {{totalTweetedItems}}</p>
+          <!-- <p>Showing: {{showingItems}}</p> -->
+        </div>
+      </div>
     </div>
-    <div class="col-md-9 well">
-      <div class="col-md-4">
-        <div class="form-group label-floating is-empty">
-          <div class="checkbox checkbox-primary">
-            <label>
-              <input type="checkbox" name="selectAll" id="show-pending"/>
-              Show Only Pending
-            </label>
+    <div class="col-md-9">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class="col-md-4">
+            <div class="form-group label-floating is-empty">
+              <div class="checkbox checkbox-primary">
+                <label>
+                  <input type="checkbox" name="selectAll" id="show-pending"/>
+                  Show Only Pending
+                </label>
+              </div>
+            </div>
+            <div class="form-group label-floating is-empty">
+              <input type="number" class="form-control" id="change-page-number" placeholder="Go to page {{ pageRange }}" min="0" max="{{ maxPage }}" value="{{currentPage}}">
+              <span class="help-block small">Current Page is {{currentPage}} and the maximum {{ maxPage }}.</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+          </div>
+          <div class="col-md-4 text-right">
+            <p>Selected Entries: {{ selectedItemsCount }}</p>
+            <a id="auto-tweet" class="btn btn-primary btn-large" href="#">Tweet</a>
           </div>
         </div>
-        <div class="form-group label-floating is-empty">
-          <input type="number" class="form-control" id="change-page-number" placeholder="Go to page {{ pageRange }}" min="1" max="{{ maxPage }}">
-          <span class="help-block small">Current Page is {{currentPage}} and the maximum {{ maxPage }}.</span>
-        </div>
-      </div>
-      <div class="col-md-4">
-      </div>
-      <div class="col-md-4 text-right">
-        <p>Selected Entries: </p>
-        <a id="auto-tweet" class="btn btn-primary btn-large" href="#">Tweet</a>
       </div>
     </div>
   </div>
   <div class="row">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th class="col-md-1">
-                <div class="checkbox checkbox-primary">
-                  <label>
-                    <input type="checkbox" name="selectAll" id="all-notifications"/>
-                    All
-                  </label>
-                </div>
-              </th>
-              <th class="col-md-6">Title</th>
-              <th class="col-md-3">Handle</th>
-              <th class="col-md-2">Last Modified</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each items}}
-            <tr class="{{selectedFeedEntry}} {{alreadyTweeted}}">
-              <td>
-                {{> itemSelect }}
-              </td>
-              <td>{{ title }}</td>
-              <td><a href="{{ handle }}" target="_blank">{{ handle }}</a></td>
-              <td>{{ lastModified }}</td>
-            </tr>
-            {{/each}}
-          </tbody>
-        </table>
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="col-md-1">
+                  <div class="checkbox checkbox-primary">
+                    <label>
+                      <input type="checkbox" name="selectAll" id="all-items"/>
+                      All
+                    </label>
+                  </div>
+                </th>
+                <th class="col-md-6">Title</th>
+                <th class="col-md-3">Handle</th>
+                <th class="col-md-2">Last Modified</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each items}}
+              <tr class="{{selectedFeedEntry}} {{alreadyTweeted}}">
+                <td>
+                  {{> itemSelect }}
+                </td>
+                <td>{{ title }}</td>
+                <td><a href="{{ handle }}" target="_blank">{{ handle }}</a></td>
+                <td>{{ lastModified }}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <template name="itemSelect">
-  <div class="checkbox checkbox-primary {{alreadyTweeted}}">
+  {{#unless alreadyTweeted}}
+  <div class="checkbox checkbox-primary">
     <label>
-      <input type="checkbox" name="selectItem" id="{{_id}}" {{alreadyTweeted}}/>
+      <input type="checkbox" name="selectItem" class="item-selected" id="{{_id}}"/>
     </label>
   </div>
+  {{/unless}}
 </template>

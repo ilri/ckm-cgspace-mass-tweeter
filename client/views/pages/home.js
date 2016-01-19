@@ -1,4 +1,5 @@
 itemsPaginator = new Paginator(Items, 50);
+selectedItemsCount = new ReactiveVar(0);
 
 Template.home.helpers({
   items: function(){
@@ -39,8 +40,8 @@ Template.home.helpers({
   alreadyTweeted: function(){
     return this.tweeted ? "info" : "";
   },
-  selectedItem: function () {
-    return Session.equals("selectedItemId", this._id) ? "btn-primary" : "";
+  selectedItemsCount: function () {
+    return selectedItemsCount.get();
   },
   lastModified: function(){
     return moment(this.lastModified).format('YYYY MM DD');
@@ -51,6 +52,27 @@ Template.home.helpers({
 });
 
 Template.home.events({
+  "change #all-items": function (e, t) {
+    if (e.target.checked) {
+      t.$("table tbody tr>td input").prop("checked", true);
+      Session.set("isNotificationSelected", true);
+    } else {
+      t.$("table tbody tr>td input").prop("checked", false);
+      Session.set("isNotificationSelected", false);
+    }
+    t.$("table tbody tr>td input").trigger("change");
+  },
+  "change input.item-selected": function(e, t){
+    if (e.target.checked) {
+      selectedItemsCount.set(selectedItemsCount.get() + 1);
+      if(t.$("table tbody tr>td input:checked").length == t.$("table tbody tr>td input").length){
+        t.$("input#all-items").prop("checked", true);
+      }
+    } else {
+      selectedItemsCount.set(selectedItemsCount.get() - 1);
+      t.$("input#all-items").prop("checked", false);
+    }
+  },
   "change input#show-pending": function (e, t) {
     if (e.target.checked) {
       Session.set("pendingOnly", true);
@@ -59,16 +81,19 @@ Template.home.events({
     }
   },
   "change input#change-page-number": function (e, t) {
+    t.$("input#all-items, table tbody tr>td input").prop("checked", false);
+    selectedItemsCount.set(0);
     var newValue = e.target.value;
-    if ( newValue > 1) {
+    if ( newValue >= 1 && newValue <= parseInt(e.target.attributes["max"].value, 10)) {
       itemsPaginator.currentPage.set(newValue);
     }
   }
 });
 
+
 Template.itemSelect.helpers({
   alreadyTweeted: function(){
-    return this.tweeted ? "disabled" : "";
+    return this.tweeted;
   }
 });
 

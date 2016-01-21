@@ -15,20 +15,6 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <div class="col-md-4">
-            <div class="form-group label-floating is-empty">
-              <div class="checkbox checkbox-primary">
-                <label>
-                  <input type="checkbox" name="selectAll" id="show-pending"/>
-                  Show Only Pending
-                </label>
-              </div>
-            </div>
-            <div class="form-group label-floating is-empty">
-              <input type="number" class="form-control" id="change-page-number" placeholder="Go to page {{ pageRange }}" min="0" max="{{ maxPage }}" value="{{currentPage}}">
-              <span class="help-block small">Current Page is {{currentPage}} and the maximum {{ maxPage }}.</span>
-            </div>
-          </div>
-          <div class="col-md-4">
             <div class="form-group">
               <div class="input-group">
                 <input type="number" id="items-to-fetch" class="form-control" min="50" max="100" value="50"/>
@@ -39,6 +25,9 @@
               <span class="help-block small">Fetch Items (50 - 100).</span>
             </div>
           </div>
+          <div class="col-md-4">
+
+          </div>
           <div class="col-md-4 text-right">
             <p>Selected Entries: {{ selectedItemsCount }}</p>
             <a id="tweet-items" class="btn btn-success btn-large" href="#"><i class="fa fa-twitter"></i> Tweet</a>
@@ -47,9 +36,16 @@
       </div>
     </div>
   </div>
+  {{> items}}
+</template>
+
+<template name="items">
   <div class="row">
     <div class="col-md-12">
       <div class="panel panel-default">
+        <div class="panel-header">
+          {{> pagesNav}}
+        </div>
         <div class="panel-body">
           <table class="table table-striped">
             <thead>
@@ -57,8 +53,7 @@
                 <th class="col-md-1">
                   <div class="checkbox checkbox-primary">
                     <label>
-                      <input type="checkbox" name="selectAll" id="all-items"/>
-                      All
+                      <input type="checkbox" name="selectAll" id="all-items"/> All
                     </label>
                   </div>
                 </th>
@@ -68,22 +63,22 @@
               </tr>
             </thead>
             <tbody>
-              {{#each items}}
-              <tr class="{{selectedFeedEntry}} {{alreadyTweeted}}">
-                <td>
-                  {{> itemSelect }}
-                </td>
-                <td>{{ title }}</td>
-                <td><a href="{{ handle }}" target="_blank">{{ handle }}</a></td>
-                <td>{{ lastModified }}</td>
-              </tr>
-              {{/each}}
+              {{> pages}}
             </tbody>
           </table>
         </div>
       </div>
     </div>
   </div>
+</template>
+
+<template name="item">
+  <tr>
+    <td>{{> itemSelect}}</td>
+    <td>{{title}}</td>
+    <td><a href="{{handle}}" target="_blank">{{handle}}</a></td>
+    <td>{{lastModified}}</td>
+  </tr>
 </template>
 
 <template name="itemSelect">

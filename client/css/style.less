@@ -10,6 +10,17 @@ table{
       color: #888 !important;
     }
   }
+  tr{
+    td {
+      a {
+        color: #4caf50;
+      }
+    }
+  }
+  .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check,
+  .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check:before{
+    color: #4caf50;
+  }
 }
 section#main-content{
   div.at-form{
@@ -26,6 +37,38 @@ section#main-content{
   section#main-content{
     div.at-form{
       width: 80%;
+    }
+  }
+}
+.pagination{
+  border-radius: 0px;
+  margin-bottom: 0px;
+  > li:first-child,  > li:last-child {
+    > a, > span{
+      border-radius: 0px;
+      color: #4caf50;
+    }
+  }
+  li {
+    display: inline-block;
+    border: none;
+    margin-left: 10px;
+    &:first-child{
+      margin-left: 0px;
+    }
+    a {
+      color: #4caf50;
+      font-size: 1.5em;
+      padding: 5px 15px;
+      border: none;
+    }
+    &:hover a, > a:hover {
+      color: #38833b;
+    }
+    &.active a, &.active a:active, &.active a:focus, &.active a:hover, &.active a:visited, &.active:hover a{
+      background-color: #4caf50;
+      border-color: #4caf50;
+      outline: none;
     }
   }
 }

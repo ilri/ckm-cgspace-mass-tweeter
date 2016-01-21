@@ -1,47 +1,18 @@
-itemsPaginator = new Paginator(Items, 50);
 selectedItemsCount = new ReactiveVar(0);
 
+fetchEvent.addListener('complete', function(newAdditions) {
+    toastr.success(newAdditions + " CGSpace items imported", "Success!");
+});
+
 Template.home.helpers({
-  items: function(){
-    if(Session.equals("pendingOnly", true)){
-      return itemsPaginator.pagedItems({find: {tweeted: false}});
-    } else {
-      return itemsPaginator.pagedItems({});
-    }
-  },
-  itemsPaginator: function(){
-    return itemsPaginator;
-  },
   totalItems: function(){
-    if(Session.equals("pendingOnly", true)){
-      return Counts.get("pendingItemsCount");
-    } else {
-      return Counts.get("itemsCount");
-    }
+    return Counts.get("pendingItemsCount");
   },
   totalTweetedItems: function(){
     return Counts.get("tweetedItemsCount");
   },
-  currentPage: function(){
-    return itemsPaginator.currentPage.get();
-  },
-  pageRange: function(){
-    return "1 - " + itemsPaginator.totalPages();
-  },
-  maxPage: function(){
-    return itemsPaginator.totalPages();
-  },
-  alreadyTweeted: function(){
-    return this.tweeted ? "info" : "";
-  },
   selectedItemsCount: function () {
     return selectedItemsCount.get();
-  },
-  lastModified: function(){
-    return moment(this.lastModified).format('YYYY MM DD');
-  },
-  hasBeenTweeted: function(){
-    return this.tweeted ? "checked='checked'" : "";
   }
 });
 
@@ -67,31 +38,6 @@ Template.home.events({
       t.$("input#all-items").prop("checked", false);
     }
   },
-  "change input#show-pending": function (e, t) {
-    if (e.target.checked) {
-      Session.set("pendingOnly", true);
-    } else {
-      Session.set("pendingOnly", null);
-    }
-  },
-  "change input#change-page-number": function (e, t) {
-    t.$("input#all-items, table tbody tr>td input").prop("checked", false);
-    selectedItemsCount.set(0);
-    var newValue = e.target.value;
-    if ( newValue >= 1 && newValue <= parseInt(e.target.attributes["max"].value, 10)) {
-      itemsPaginator.currentPage.set(newValue);
-    }
-  },
-  "click #tweet-items": function (e, t) {
-     var selectedItems = _.map(t.findAll("table tr td input:checked"), function (checkbox) {
-      return {
-        _id: checkbox.value,
-        title: checkbox.dataset.itemTitle,
-        handle: checkbox.dataset.itemHandle
-      };
-    });
-    Meteor.call("tweetItems", selectedItems);
-  },
   "click #fetch-items": function (e, t) {
     var minNumberOfItems = parseInt(t.$("#items-to-fetch").attr("min"), 10);
     var newNumberOfItems = parseInt(t.$("#items-to-fetch").val(), 10);
@@ -106,12 +52,17 @@ Template.home.events({
       if(error) {
         toastr.error(error, "Error while getting items from CGSpace, please try again!");
       } else {
-        toastr.success("CGSpace items imported", "Success!");
+        toastr.info("CGSpace items are being imported.", "Import Started");
       }
     });
   }
 });
 
+Template.item.helpers({
+  lastModified: function(){
+    return moment(this.lastModified).format('YYYY MM DD');
+  }
+});
 
 Template.itemSelect.helpers({
   alreadyTweeted: function(){
@@ -121,4 +72,5 @@ Template.itemSelect.helpers({
 
 Template.itemSelect.onRendered(function(){
   $.material.checkbox();
+  $("input#all-items").prop("checked", false);
 });

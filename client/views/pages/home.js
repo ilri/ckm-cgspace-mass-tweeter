@@ -1,4 +1,5 @@
 selectedItemsCount = new ReactiveVar(0);
+searchField = new ReactiveVar("Title");
 
 fetchEvent.addListener('complete', function(newAdditions) {
     toastr.success(newAdditions + " CGSpace items imported", "Success!");
@@ -13,6 +14,9 @@ Template.home.helpers({
   },
   selectedItemsCount: function () {
     return selectedItemsCount.get();
+  },
+  selectedSearchField: function(){
+    return searchField.get();
   }
 });
 
@@ -55,12 +59,47 @@ Template.home.events({
         toastr.info("CGSpace items are being imported.", "Import Started");
       }
     });
+  },
+  "keyup #items-to-fetch": function(e, t){
+    if(e.keyCode == 13){
+      t.$("#fetch-items").trigger("click");
+    }
+  },
+  "click table thead th.sortable": function(e, t){
+    t.$("table thead th.active").removeClass("active");
+    t.$(e.target).addClass("active");
+    //e.traget.className += " active";
+    searchField.set(t.$(e.target).text());
+  },
+  "click #search-items": function(e, t){
+    var selectedField = searchField.get();
+    var searchTerm = t.$("#search-term").val().trim();
+    if(searchTerm){
+      selectedField = selectedField.charAt(0).toLowerCase() + selectedField.replace(" ", "").slice(1);
+      var searchFilter = {};
+      searchFilter[selectedField] = {$regex : ".*"+ searchTerm +".*"};
+      Items.set({
+        filters: searchFilter
+      });
+    } else {
+      toastr.info("Please type in your search term");
+    }
+  },
+  "keyup #search-term": function(e, t){
+    if(e.keyCode == 13){
+      t.$("#search-items").trigger("click");
+    } else if(e.keyCode == 27){ // ESC key means reset
+      e.target.value = "";
+      Items.set({
+        filters: {}
+      });
+    }
   }
 });
 
 Template.item.helpers({
   lastModified: function(){
-    return moment(this.lastModified).format('YYYY MM DD');
+    return moment(this.lastModified).format('YYYY-MM-DD');
   }
 });
 

@@ -7,7 +7,6 @@
         <div class="panel-body">
           <p>Total Entries: {{totalItems}}</p>
           <p>Total Tweets: {{totalTweetedItems}}</p>
-          <!-- <p>Showing: {{showingItems}}</p> -->
         </div>
       </div>
     </div>
@@ -19,14 +18,22 @@
               <div class="input-group">
                 <input type="number" id="items-to-fetch" class="form-control" min="50" max="100" value="50"/>
                 <span class="input-group-btn">
-                  <button id="fetch-items" class="btn btn-success btn-xs" type="button"><i class="fa fa-refresh"></i></button>
+                  <button id="fetch-items" class="btn btn-success" type="button"><i class="fa fa-refresh"></i></button>
                 </span>
               </div>
               <span class="help-block small">Fetch Items (50 - 100).</span>
             </div>
           </div>
           <div class="col-md-4">
-
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" id="search-term" class="form-control"/>
+                <span class="input-group-btn">
+                  <button id="search-items" class="btn btn-success" type="button"><i class="fa fa-search"></i></button>
+                </span>
+              </div>
+              <span class="help-block small">Search items (<em>{{selectedSearchField}}</em>). Press <strong>ESC</strong> to clear.</span>
+            </div>
           </div>
           <div class="col-md-4 text-right">
             <p>Selected Entries: {{ selectedItemsCount }}</p>
@@ -57,9 +64,9 @@
                     </label>
                   </div>
                 </th>
-                <th class="col-md-6">Title</th>
-                <th class="col-md-3">Handle</th>
-                <th class="col-md-2">Last Modified</th>
+                <th class="col-md-6 sortable active">Title</th>
+                <th class="col-md-3 sortable">Handle</th>
+                <th class="col-md-2 sortable">Last Modified</th>
               </tr>
             </thead>
             <tbody>

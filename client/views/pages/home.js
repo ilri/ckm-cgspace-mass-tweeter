@@ -73,4 +73,5 @@ Template.itemSelect.helpers({
 Template.itemSelect.onRendered(function(){
   $.material.checkbox();
   $("input#all-items").prop("checked", false);
+  selectedItemsCount.set($("table tbody tr>td input:checked").length);
 });

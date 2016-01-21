@@ -28,7 +28,8 @@ http
 aldeed:http
 useraccounts:materialize
 danielqiu:feed
-tsega:paginator
 momentjs:moment
 reactive-var
 lablancas:twitter
+tmeasday:publish-counts
+tsega:paginator

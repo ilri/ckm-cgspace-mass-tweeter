@@ -29,10 +29,19 @@
             </div>
           </div>
           <div class="col-md-4">
+            <div class="form-group">
+              <div class="input-group">
+                <input type="number" id="items-to-fetch" class="form-control" min="50" max="100" value="50"/>
+                <span class="input-group-btn">
+                  <button id="fetch-items" class="btn btn-success btn-xs" type="button"><i class="fa fa-refresh"></i></button>
+                </span>
+              </div>
+              <span class="help-block small">Fetch Items (50 - 100).</span>
+            </div>
           </div>
           <div class="col-md-4 text-right">
             <p>Selected Entries: {{ selectedItemsCount }}</p>
-            <a id="tweet-items" class="btn btn-success btn-large" href="#">Tweet</a>
+            <a id="tweet-items" class="btn btn-success btn-large" href="#"><i class="fa fa-twitter"></i> Tweet</a>
           </div>
         </div>
       </div>

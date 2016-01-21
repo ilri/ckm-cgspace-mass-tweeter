@@ -14,22 +14,13 @@ Template.home.helpers({
   },
   totalItems: function(){
     if(Session.equals("pendingOnly", true)){
-      return Items.find({tweeted: false}).count();
+      return Counts.get("pendingItemsCount");
     } else {
-      return Items.find().count()
+      return Counts.get("itemsCount");
     }
   },
   totalTweetedItems: function(){
-    return Items.find({tweeted: true}).count();
-  },
-  showingItems: function(){
-    var finalPageEntries = Items.find({}, {
-      skip: (itemsPaginator.currentPage.get() - 1) * itemsPaginator.perPage,
-      limit: itemsPaginator.perPage
-    }).count();
-    var initialEntry = (itemsPaginator.currentPage.get() * itemsPaginator.perPage) - (itemsPaginator.perPage - 1 );
-    var finalEntry = initialEntry + finalPageEntries - 1;
-    return initialEntry + " - " + finalEntry;
+    return Counts.get("tweetedItemsCount");
   },
   currentPage: function(){
     return itemsPaginator.currentPage.get();
@@ -101,6 +92,24 @@ Template.home.events({
     });
     Meteor.call("tweetItems", selectedItems);
   },
+  "click #fetch-items": function (e, t) {
+    var minNumberOfItems = parseInt(t.$("#items-to-fetch").attr("min"), 10);
+    var newNumberOfItems = parseInt(t.$("#items-to-fetch").val(), 10);
+    var maxNumberOfItems = parseInt(t.$("#items-to-fetch").attr("max"), 10);
+
+    if(newNumberOfItems < minNumberOfItems){
+      newNumberOfItems = minNumberOfItems;
+    } else if(newNumberOfItems > maxNumberOfItems){
+      newNumberOfItems = maxNumberOfItems;
+    }
+    Meteor.call("getCGSpaceItems", {limit: newNumberOfItems, offset: 0}, function(error){
+      if(error) {
+        toastr.error(error, "Error while getting items from CGSpace, please try again!");
+      } else {
+        toastr.success("CGSpace items imported", "Success!");
+      }
+    });
+  }
 });
 
 

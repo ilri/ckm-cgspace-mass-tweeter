@@ -1,13 +1,12 @@
 Meteor.methods({
-  getCGSpaceItems: function (options) {
+  getCGSpaceItems: function (options, endpoint) {
     this.unblock();
     var newAdditions = 0;
 
-    if(options.offset == null){
-      options.offset = Items.Collection.find().count();
-    }
+    endpoint = endpoint || Meteor.settings.cgspace_rest_endpoint;
+    options.offset = options.offset || Items.Collection.find().count();
 
-    Meteor.http.get("https://cgspace.cgiar.org/rest/items/", {params: options}, function(error, results) {
+    Meteor.http.get(endpoint, {params: options}, function(error, results) {
       if(error) throw error;
       if((results.data.length)){
         _.each(results.data, function(item){

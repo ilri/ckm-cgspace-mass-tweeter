@@ -14,6 +14,13 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <div class="col-md-4">
+            {{> setAPIEndpointOption }}
+            {{#if setEndpoint }}
+            <div class="form-group">
+              <input type="text" id="endpoint" class="form-control" />
+              <span class="help-block small">Set the CGSpace API endpoint.</span>
+            </div>
+            {{/if}}
             {{> skipSpecifyOption }}
             {{#if skipItems}}
             <div class="form-group">
@@ -140,6 +147,16 @@
     <div class="checkbox checkbox-primary">
       <label>
         <input type="checkbox" name="selectAll" id="skip-items"/> Specify Items to skip
+      </label>
+    </div>
+  </div>
+</template>
+
+<template name="setAPIEndpointOption">
+  <div class="form-group">
+    <div class="checkbox checkbox-primary">
+      <label>
+        <input type="checkbox" name="selectAll" id="set-endpoint"/> Set API Endpoint
       </label>
     </div>
   </div>

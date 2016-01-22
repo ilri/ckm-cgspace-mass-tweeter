@@ -2,9 +2,10 @@ selectedItemsCount = new ReactiveVar(0);
 searchField = new ReactiveVar("importedDate");
 searchFieldType = new ReactiveVar("date");
 specifySkipItems = new ReactiveVar(false);
+setAPIEndpoint = new ReactiveVar(false);
 
 fetchEvent.addListener('complete', function(newAdditions) {
-  toastr.success(newAdditions + " CGSpace items imported", "Success!");
+  toastr.success(newAdditions + " CGSpace items imported", "Success!", {timeOut: 0, "extendedTimeOut": 0});
 });
 
 Template.home.helpers({
@@ -25,6 +26,9 @@ Template.home.helpers({
   },
   skipItems: function(){
     return specifySkipItems.get();
+  },
+  setEndpoint: function(){
+    return setAPIEndpoint.get();
   }
 });
 
@@ -51,6 +55,8 @@ Template.home.events({
     }
   },
   "click #fetch-items": function (e, t) {
+    var endPoint = t.$("#endpoint").val();
+
     var minNumberOfItems = parseInt(t.$("#items-to-fetch").attr("min"), 10);
     var newNumberOfItems = parseInt(t.$("#items-to-fetch").val(), 10);
     var maxNumberOfItems = parseInt(t.$("#items-to-fetch").attr("max"), 10);
@@ -76,7 +82,7 @@ Template.home.events({
       newNumberOfItems = maxNumberOfItems;
     }
 
-    Meteor.call("getCGSpaceItems", {limit: newNumberOfItems, offset: newNumberOfItemsToSkip}, function(error){
+    Meteor.call("getCGSpaceItems", {limit: newNumberOfItems, offset: newNumberOfItemsToSkip}, endPoint, function(error){
       if(error) {
         toastr.error(error, "Error while getting items from CGSpace, please try again!");
       } else {
@@ -245,5 +251,21 @@ Template.skipSpecifyOption.events({
 });
 
 Template.skipSpecifyOption.onRendered(function(){
+    $.material.checkbox();
+});
+
+
+
+Template.setAPIEndpointOption.events({
+  "change #set-endpoint": function(e, t){
+    if(e.target.checked){
+      setAPIEndpoint.set(true);
+    } else {
+      setAPIEndpoint.set(false);
+    }
+  }
+});
+
+Template.setAPIEndpointOption.onRendered(function(){
     $.material.checkbox();
 });

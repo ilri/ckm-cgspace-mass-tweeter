@@ -1,5 +1,5 @@
 <template name="home">
-  <h1 class="text-center">CGSpace Mass Tweets</h1>
+  {{> navbar }}
   <div class="row">
     <div class="col-md-3">
       <div class="panel panel-success">
@@ -26,6 +26,9 @@
           </div>
           <div class="col-md-4">
             <div class="form-group">
+              {{#if showDateSearchForm }}
+              {{> dateSearchForm }}
+              {{else}}
               <div class="input-group">
                 <input type="text" id="search-term" class="form-control"/>
                 <span class="input-group-btn">
@@ -33,6 +36,7 @@
                 </span>
               </div>
               <span class="help-block small">Search items (<em>{{selectedSearchField}}</em>). Press <strong>ESC</strong> to clear.</span>
+              {{/if}}
             </div>
           </div>
           <div class="col-md-4 text-right">
@@ -64,9 +68,14 @@
                     </label>
                   </div>
                 </th>
-                <th class="col-md-6 sortable active">Title</th>
-                <th class="col-md-3 sortable">Handle</th>
-                <th class="col-md-2 sortable">Last Modified</th>
+                <th class="col-md-4 sortable" data-sort-field="title" data-sort-field-type="text" >Title</th>
+                <th class="col-md-3 sortable" data-sort-field="handle" data-sort-field-type="text">Handle</th>
+                <th class="col-md-2 sortable" data-sort-field="lastModified" data-sort-field-type="date">Last Modified</th>
+                <th class="col-md-2 sortable active" data-sort-field="importedDate" data-sort-field-type="date">Imported On
+                  <div id="sorter" class="pull-right">
+                    <i class="fa fa-chevron-circle-up"></i><i class="fa fa-chevron-circle-down active"></i>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -85,6 +94,7 @@
     <td>{{title}}</td>
     <td><a href="{{handle}}" target="_blank">{{handle}}</a></td>
     <td>{{lastModified}}</td>
+    <td>{{importedOn}}</td>
   </tr>
 </template>
 
@@ -96,4 +106,21 @@
     </label>
   </div>
   {{/unless}}
+</template>
+
+<template name="dateSearchForm">
+  <div class="input-group datetimepicker">
+    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+    <input id="search-after-date" class="form-control picker" type="text"/>
+    <span class="help-block small">Pick <strong>After</strong> date.</span>
+  </div>
+  <div class="input-group datetimepicker">
+    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+    <input id="search-before-date" class="form-control picker" type="text"/>
+    <span class="help-block small">Pick <strong>Before</strong> date.</span>
+  </div>
+  <div>
+    <button id="search-items-by-date" class="btn btn-success" type="button"><i class="fa fa-search"></i></button>
+    <button id="clear-search-items-by-date" class="btn btn-success" type="button"><i class="fa fa-times-circle"></i></button>
+  </div>
 </template>

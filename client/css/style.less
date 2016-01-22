@@ -1,9 +1,26 @@
+body{
+  padding-top: 70px;
+}
+nav.navbar.navbar-default.navbar-cg{
+  background-color: #4caf50;
+}
 div.disabled{
   span.check{
     border-color: #888;
   }
 }
 table{
+  th {
+    i.fa {
+      font-size: 20px;
+      &:hover, &.active {
+        color: #4caf50;
+      }
+      &.fa-chevron-circle-up{
+        margin-right: 5px;
+      }
+    }
+  }
   tr.info{
     color: #888 !important;
     a{

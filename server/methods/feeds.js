@@ -15,7 +15,7 @@ Meteor.methods({
               itemId: item.id,
               handle: "http://hdl.handle.net/" + item.handle,
               title: item.name,
-              lastModified: item.lastModified,
+              lastModified: new Date(item.lastModified),
               tweeted: false,
               createdDate: new Date()
             });

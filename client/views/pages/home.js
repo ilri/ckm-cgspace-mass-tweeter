@@ -1,8 +1,9 @@
 selectedItemsCount = new ReactiveVar(0);
-searchField = new ReactiveVar("Title");
+searchField = new ReactiveVar("importedDate");
+searchFieldType = new ReactiveVar("date");
 
 fetchEvent.addListener('complete', function(newAdditions) {
-    toastr.success(newAdditions + " CGSpace items imported", "Success!");
+  toastr.success(newAdditions + " CGSpace items imported", "Success!");
 });
 
 Template.home.helpers({
@@ -17,6 +18,9 @@ Template.home.helpers({
   },
   selectedSearchField: function(){
     return searchField.get();
+  },
+  showDateSearchForm: function(){
+    return searchFieldType.get() == "date";
   }
 });
 
@@ -68,16 +72,43 @@ Template.home.events({
   "click table thead th.sortable": function(e, t){
     t.$("table thead th.active").removeClass("active");
     t.$(e.target).addClass("active");
-    //e.traget.className += " active";
-    searchField.set(t.$(e.target).text());
+
+    searchField.set(t.$(e.target).data("sort-field"));
+    searchFieldType.set(t.$(e.target).data("sort-field-type"));
+
+    // Move the sorter to the header
+    t.$("#sorter").appendTo(t.$(e.target));
+  },
+  "click table thead th.sortable div#sorter": function(e, t){
+    e.stopPropagation();
+  },
+  "click table thead th.sortable i": function(e, t){
+    e.stopPropagation();
+    var sortDirection = 1;
+
+    t.$("i.active").removeClass("active");
+    t.$(t.$(e.target)).addClass("active");
+
+    if(t.$(e.target).hasClass("fa-chevron-circle-up")){
+      sortDirection = 1;
+    } else {
+      sortDirection = -1;
+    }
+
+    sortKey = searchField.get();
+    sortOption = {};
+    sortOption[sortKey] = sortDirection;
+
+    Items.set({
+      sort: sortOption
+    });
   },
   "click #search-items": function(e, t){
     var selectedField = searchField.get();
     var searchTerm = t.$("#search-term").val().trim();
     if(searchTerm){
-      selectedField = selectedField.charAt(0).toLowerCase() + selectedField.replace(" ", "").slice(1);
       var searchFilter = {};
-      searchFilter[selectedField] = {$regex : ".*"+ searchTerm +".*"};
+      searchFilter[selectedField] = {$regex : ".*"+ searchTerm +".*", $options: '-i'};
       Items.set({
         filters: searchFilter
       });
@@ -100,6 +131,9 @@ Template.home.events({
 Template.item.helpers({
   lastModified: function(){
     return moment(this.lastModified).format('YYYY-MM-DD');
+  },
+  importedOn: function(){
+    return moment(this.importedDate).format('YYYY-MM-DD');
   }
 });
 
@@ -113,4 +147,63 @@ Template.itemSelect.onRendered(function(){
   $.material.checkbox();
   $("input#all-items").prop("checked", false);
   selectedItemsCount.set($("table tbody tr>td input:checked").length);
+});
+
+Template.dateSearchForm.events({
+  "click #search-items-by-date": function(e, t){
+    var selectedField = searchField.get();
+
+    var afterDateString = t.$("#search-after-date").val().trim();
+    var beforeDateString = t.$("#search-before-date").val().trim();
+
+    if(afterDateString == "" && beforeDateString == ""){ // no dates picked
+      toastr.info("Please pick a date!");
+    } else {
+      var afterDate, beforeDate = null;
+      var searchFilter = {}
+
+      if(afterDateString != ""){
+        afterDate = moment(afterDateString, "MM/DD/YYYY h:mm A");
+      }
+
+      if(beforeDateString != ""){
+        beforeDate = moment(beforeDateString, "MM/DD/YYYY h:mm A");
+      }
+
+      if(afterDate && beforeDate){ // search in specified range
+        if(beforeDate > afterDate){
+          searchFilter[selectedField] = {
+            $gte: afterDate.toDate(),
+            $lte: beforeDate.toDate()
+          }
+        } else {
+          toastr.info("Please make sure your selected date range is correct!");
+        }
+      } else if(afterDate) {     // search after specified date
+        searchFilter[selectedField] = {
+          $gte: afterDate.toDate()
+        }
+      } else if(beforeDate) {   // search before specified date
+        searchFilter[selectedField] = {
+          $lte: beforeDate.toDate()
+        }
+      }
+    }
+
+    if(searchFilter[selectedField]){ // make sure filter is specified
+      Items.set({
+        filters: searchFilter
+      });
+    }
+  },
+  "click #clear-search-items-by-date": function(e, t){
+    t.$(".picker").val("");
+    Items.set({
+      filters: {}
+    });
+  }
+});
+
+Template.dateSearchForm.onRendered(function(){
+  this.$('.datetimepicker').datetimepicker();
 });

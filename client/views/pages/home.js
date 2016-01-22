@@ -1,6 +1,7 @@
 selectedItemsCount = new ReactiveVar(0);
 searchField = new ReactiveVar("importedDate");
 searchFieldType = new ReactiveVar("date");
+specifySkipItems = new ReactiveVar(false);
 
 fetchEvent.addListener('complete', function(newAdditions) {
   toastr.success(newAdditions + " CGSpace items imported", "Success!");
@@ -21,6 +22,9 @@ Template.home.helpers({
   },
   showDateSearchForm: function(){
     return searchFieldType.get() == "date";
+  },
+  skipItems: function(){
+    return specifySkipItems.get();
   }
 });
 
@@ -51,12 +55,28 @@ Template.home.events({
     var newNumberOfItems = parseInt(t.$("#items-to-fetch").val(), 10);
     var maxNumberOfItems = parseInt(t.$("#items-to-fetch").attr("max"), 10);
 
+    var newNumberOfItemsToSkip = null;
+
+    if(specifySkipItems.get()){
+
+      var minNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").attr("min"), 10);
+      newNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").val(), 10);
+      var maxNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").attr("max"), 10);
+
+      if(newNumberOfItemsToSkip < minNumberOfItemsToSkip){
+        newNumberOfItemsToSkip = minNumberOfItemsToSkip;
+      } else if(newNumberOfItemsToSkip > maxNumberOfItemsToSkip){
+        newNumberOfItemsToSkip = maxNumberOfItemsToSkip;
+      }
+    }
+
     if(newNumberOfItems < minNumberOfItems){
       newNumberOfItems = minNumberOfItems;
     } else if(newNumberOfItems > maxNumberOfItems){
       newNumberOfItems = maxNumberOfItems;
     }
-    Meteor.call("getCGSpaceItems", {limit: newNumberOfItems, offset: 0}, function(error){
+
+    Meteor.call("getCGSpaceItems", {limit: newNumberOfItems, offset: newNumberOfItemsToSkip}, function(error){
       if(error) {
         toastr.error(error, "Error while getting items from CGSpace, please try again!");
       } else {
@@ -204,6 +224,26 @@ Template.dateSearchForm.events({
   }
 });
 
+Template.dateSearchForm.helpers({
+  selectedSearchField: function(){
+    return searchField.get();
+  }
+});
+
 Template.dateSearchForm.onRendered(function(){
   this.$('.datetimepicker').datetimepicker();
+});
+
+Template.skipSpecifyOption.events({
+  "change #skip-items": function(e, t){
+    if(e.target.checked){
+      specifySkipItems.set(true);
+    } else {
+      specifySkipItems.set(false);
+    }
+  }
+});
+
+Template.skipSpecifyOption.onRendered(function(){
+    $.material.checkbox();
 });

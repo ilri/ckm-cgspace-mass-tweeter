@@ -2,8 +2,11 @@ Meteor.methods({
   getCGSpaceItems: function (options) {
     this.unblock();
     var newAdditions = 0;
-    var itemsCount = Items.Collection.find().count();
-    options.offset = itemsCount;
+
+    if(options.offset == null){
+      options.offset = Items.Collection.find().count();
+    }
+
     Meteor.http.get("https://cgspace.cgiar.org/rest/items/", {params: options}, function(error, results) {
       if(error) throw error;
       if((results.data.length)){
@@ -17,7 +20,7 @@ Meteor.methods({
               title: item.name,
               lastModified: new Date(item.lastModified),
               tweeted: false,
-              createdDate: new Date()
+              importedDate: new Date()
             });
           }
         });

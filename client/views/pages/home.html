@@ -14,6 +14,13 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <div class="col-md-4">
+            {{> skipSpecifyOption }}
+            {{#if skipItems}}
+            <div class="form-group">
+              <input type="number" id="items-to-skip" class="form-control" min="0" max="49950" value="0"/>
+              <span class="help-block small">Items to Skip (0 - ~49,950).</span>
+            </div>
+            {{/if}}
             <div class="form-group">
               <div class="input-group">
                 <input type="number" id="items-to-fetch" class="form-control" min="50" max="100" value="50"/>
@@ -122,5 +129,18 @@
   <div>
     <button id="search-items-by-date" class="btn btn-success" type="button"><i class="fa fa-search"></i></button>
     <button id="clear-search-items-by-date" class="btn btn-success" type="button"><i class="fa fa-times-circle"></i></button>
+  </div>
+  <div>
+    <span class="help-block small">Search items (<em>{{selectedSearchField}}</em>).</span>
+  </div>
+</template>
+
+<template name="skipSpecifyOption">
+  <div class="form-group">
+    <div class="checkbox checkbox-primary">
+      <label>
+        <input type="checkbox" name="selectAll" id="skip-items"/> Specify Items to skip
+      </label>
+    </div>
   </div>
 </template>

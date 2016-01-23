@@ -20,11 +20,15 @@ Meteor.methods({
       Twitter.postAsync(client, 'statuses/update', {status: item.title + " " + item.handle},  function(error, tweet, response){
         if(error) throw error;
         // Update item tweeted status
-        Items.Collection.update({_id: item._id}, {$set: {
-          tweeted: true,
-          tweeter: Meteor.user().services.twitter.screenName,
-          tweetedOn: new Date()
-        }});
+        Items.Collection.update({_id: item._id}, {
+          $set: { tweeted: true },
+          $push: {
+            tweets: {
+              tweeter: Meteor.user().services.twitter.screenName,
+              tweetedOn: new Date()
+            }
+          }
+        });
       });
     });
   }

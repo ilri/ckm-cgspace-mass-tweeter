@@ -33,6 +33,26 @@ table{
         color: #4caf50;
       }
     }
+    &.tweeted {
+      background-color: #28A9E0 !important;
+      color: #fff;
+      td{
+        a {
+          color: #444;
+          &:hover {
+            color: #000;
+          }
+        }
+        i.fa{
+          font-size: 1.5em;
+          cursor: pointer;
+        }
+        .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check,
+        .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check:before{
+          color: #fff;
+        }
+      }
+    }
   }
 }
 .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check,
@@ -88,4 +108,7 @@ section#main-content{
       outline: none;
     }
   }
+}
+div.tweets-list{
+  margin-top: 20px;
 }

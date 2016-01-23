@@ -3,6 +3,7 @@ searchField = new ReactiveVar("importedDate");
 searchFieldType = new ReactiveVar("date");
 specifySkipItems = new ReactiveVar(false);
 setAPIEndpoint = new ReactiveVar(false);
+tweetInfo = new ReactiveVar();
 
 fetchEvent.addListener('complete', function(newAdditions) {
   toastr.success(newAdditions + " CGSpace items imported", "Success!", {timeOut: 0, "extendedTimeOut": 0});
@@ -160,12 +161,21 @@ Template.item.helpers({
   },
   importedOn: function(){
     return moment(this.importedDate).format('YYYY-MM-DD');
+  },
+  tweetedItem: function(){
+    return this.tweeted ? "tweeted" : "";
   }
 });
 
 Template.itemSelect.helpers({
   alreadyTweeted: function(){
     return this.tweeted;
+  }
+});
+
+Template.itemSelect.events({
+  "click i": function(e, t){
+    tweetInfo.set(this.tweets);
   }
 });
 
@@ -254,8 +264,6 @@ Template.skipSpecifyOption.onRendered(function(){
     $.material.checkbox();
 });
 
-
-
 Template.setAPIEndpointOption.events({
   "change #set-endpoint": function(e, t){
     if(e.target.checked){
@@ -268,4 +276,13 @@ Template.setAPIEndpointOption.events({
 
 Template.setAPIEndpointOption.onRendered(function(){
     $.material.checkbox();
+});
+
+Template.tweetInfoModal.helpers({
+  tweets: function(){
+    return tweetInfo.get();
+  },
+  tweetedDate: function(){
+    return moment(this.tweetedOn).format('MMMM Do YYYY h:mm A');
+  }
 });

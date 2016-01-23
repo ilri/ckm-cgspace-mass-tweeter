@@ -62,6 +62,7 @@
     </div>
   </div>
   {{> items}}
+  {{> tweetInfoModal}}
 </template>
 
 <template name="items">
@@ -103,7 +104,7 @@
 </template>
 
 <template name="item">
-  <tr>
+  <tr class="{{tweetedItem}}">
     <td>{{> itemSelect}}</td>
     <td>{{title}}</td>
     <td><a href="{{handle}}" target="_blank">{{handle}}</a></td>
@@ -113,13 +114,14 @@
 </template>
 
 <template name="itemSelect">
-  {{#unless alreadyTweeted}}
   <div class="checkbox checkbox-primary">
     <label>
       <input type="checkbox" name="selectItem" class="item-selected" value="{{_id}}" data-item-title="{{title}}" data-item-handle="{{handle}}"/>
     </label>
   </div>
-  {{/unless}}
+  {{#if alreadyTweeted}}
+  <i class="fa fa-info-circle" data-toggle="modal" data-target="#tweetInfoModal"></i>
+  {{/if}}
 </template>
 
 <template name="dateSearchForm">
@@ -158,6 +160,29 @@
       <label>
         <input type="checkbox" name="selectAll" id="set-endpoint"/> Set API Endpoint
       </label>
+    </div>
+  </div>
+</template>
+
+<template name="tweetInfoModal">
+  <div class="modal fade" id="tweetInfoModal" tabindex="-1" role="dialog" aria-labelledby="tweetInfoModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Who's Tweeted this Item?</h4>
+        </div>
+        <div class="modal-body">
+          <div class="tweets-list">
+            {{#each tweets}}
+            <p><a href="https://twitter.com/{{tweeter}}" target="_blank">@{{tweeter}}</a> - {{tweetedDate}}</p>
+            {{/each}}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>

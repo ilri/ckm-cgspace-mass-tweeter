@@ -1,6 +1,7 @@
 Meteor.methods({
   getCGSpaceItems: function (options, endpoint) {
     this.unblock();
+    var totalItems = options.limit;
     var newAdditions = 0;
 
     endpoint = endpoint || Meteor.settings.cgspace_rest_endpoint;
@@ -12,7 +13,6 @@ Meteor.methods({
         _.each(results.data, function(item){
           // Check if the item doesn't exist
           if(Items.Collection.find({itemId: item.id}).count() == 0){
-            newAdditions++;
             Items.Collection.insert({
               itemId: item.id,
               handle: "http://hdl.handle.net/" + item.handle,
@@ -21,9 +21,13 @@ Meteor.methods({
               tweeted: false,
               importedDate: new Date()
             });
+            // increment new items count
+            newAdditions++;
+            // send progress precentage
+            fetchEvent.emit("progress", newAdditions, (newAdditions/totalItems)*100 + "%");
           }
         });
-        //fetchEvent.setClient({additions: newAdditions});
+        // send completed adding items event
         fetchEvent.emit("complete", newAdditions);
       }
     });

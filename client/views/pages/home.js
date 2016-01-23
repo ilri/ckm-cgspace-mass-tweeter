@@ -5,8 +5,28 @@ specifySkipItems = new ReactiveVar(false);
 setAPIEndpoint = new ReactiveVar(false);
 tweetInfo = new ReactiveVar();
 
+fetchEvent.addListener('progress', function(newAdditions, percentage) {
+  $("#items-imported").text(newAdditions);
+  $("#items-progress").css({
+    width: percentage
+  })
+});
+
 fetchEvent.addListener('complete', function(newAdditions) {
   toastr.success(newAdditions + " CGSpace items imported", "Success!", {timeOut: 0, "extendedTimeOut": 0});
+  $("#fetch-items").prop('disabled', false);
+});
+
+tweetEvent.addListener('progress', function(newTweets, percentage) {
+  $("#items-tweeted").text(newTweets);
+  $("#tweets-progress").css({
+    width: percentage
+  })
+});
+
+tweetEvent.addListener('complete', function(newTweets) {
+  toastr.success(newTweets + " CGSpace items tweeted", "Success!", {timeOut: 0, "extendedTimeOut": 0});
+  $("#tweet-items").prop('disabled', false);
 });
 
 Template.home.helpers({
@@ -56,6 +76,8 @@ Template.home.events({
     }
   },
   "click #fetch-items": function (e, t) {
+    t.$("#fetch-items").prop('disabled', true);
+
     var endPoint = t.$("#endpoint").val();
 
     var minNumberOfItems = parseInt(t.$("#items-to-fetch").attr("min"), 10);
@@ -87,7 +109,7 @@ Template.home.events({
       if(error) {
         toastr.error(error, "Error while getting items from CGSpace, please try again!");
       } else {
-        toastr.info("CGSpace items are being imported.", "Import Started");
+        toastr.info("<strong id='items-imported'></strong> CGSpace items imported.<div class='progress'> <div id='items-progress' class='progress-bar progress-bar-success' style='width: 0%''></div></div>", "Import in progress!", {timeOut: 0, "extendedTimeOut": 0});
       }
     });
   },
@@ -151,6 +173,31 @@ Template.home.events({
       Items.set({
         filters: {}
       });
+    }
+  },
+  "click #tweet-items": function (e, t) {
+
+    var selectedItems = _.map(t.findAll("table tr td input:checked"), function (checkbox) {
+      return {
+        _id: checkbox.value,
+        title: checkbox.dataset.itemTitle,
+        handle: checkbox.dataset.itemHandle
+      };
+    });
+    if(selectedItems.length > 0){
+      t.$("#tweet-items").prop('disabled', true);
+      Meteor.call("tweetItems", selectedItems, function(error){
+        if(error) {
+          toastr.error(error, "Error while tweeting items, please try again!");
+        } else {
+          toastr.info("<strong id='items-tweeted'></strong> Items tweeted.<div class='progress'> <div id='tweets-progress' class='progress-bar progress-bar-success' style='width: 0%''></div></div>", "Tweets in progress!", {timeOut: 0, "extendedTimeOut": 0});
+        }
+      });
+      // Clear selected items
+      t.$("input#all-items, table tbody tr>td input:checked").prop("checked", false);
+      selectedItemsCount.set(0);
+    } else {
+      toastr.info("Please select items to Tweet");
     }
   }
 });
@@ -261,7 +308,7 @@ Template.skipSpecifyOption.events({
 });
 
 Template.skipSpecifyOption.onRendered(function(){
-    $.material.checkbox();
+  $.material.checkbox();
 });
 
 Template.setAPIEndpointOption.events({
@@ -275,7 +322,7 @@ Template.setAPIEndpointOption.events({
 });
 
 Template.setAPIEndpointOption.onRendered(function(){
-    $.material.checkbox();
+  $.material.checkbox();
 });
 
 Template.tweetInfoModal.helpers({

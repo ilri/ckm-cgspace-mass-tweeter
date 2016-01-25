@@ -13,7 +13,10 @@ The following is an overview of how the application works:
 5. The user selects the entries from the list and tweets them.
 6. The system receives the status of each tweet and updates it. (Also checks if the limit to the number of tweets has not been exceeded)
 
-## Requirements
+## More Information
 
-* A twitter user account
-* RSS Feed/Rest API from CGSpace
+Please visit the [wiki](https://github.com/tsega/ckm-cgspace-mass-tweeter/wiki) for this repository to know more about the system.
+
+# License
+
+This project is licensed under the [GNU General Public License Version 3 (GPL v3)](license.md).

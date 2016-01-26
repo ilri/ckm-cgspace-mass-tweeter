@@ -22,12 +22,10 @@ chrismbeckett:toastr
 fezvrasta:bootstrap-material-design
 less
 fortawesome:fontawesome
-ian:accounts-ui-bootstrap-3
 iron:router
 http
 aldeed:http
 useraccounts:materialize
-danielqiu:feed
 momentjs:moment
 reactive-var
 lablancas:twitter

@@ -181,9 +181,11 @@ Template.home.events({
       return {
         _id: checkbox.value,
         title: checkbox.dataset.itemTitle,
-        handle: checkbox.dataset.itemHandle
+        handle: checkbox.dataset.itemHandle,
+        hashTags: checkbox.dataset.itemHashTags
       };
     });
+    
     if(selectedItems.length > 0){
       t.$("#tweet-items").prop('disabled', true);
       Meteor.call("tweetItems", selectedItems, function(error){
@@ -211,12 +213,30 @@ Template.item.helpers({
   },
   tweetedItem: function(){
     return this.tweeted ? "tweeted" : "";
+  },
+  hashTags: function(){
+    var hashTags = _.map(this.communities, function(community){
+      var parentCommunity = Communities.findOne({_id: community});
+      if(parentCommunity){
+        return parentCommunity.hashTag;
+      }
+    });
+    return hashTags.join(" ");
   }
 });
 
 Template.itemSelect.helpers({
   alreadyTweeted: function(){
     return this.tweeted;
+  },
+  hashTags: function(){
+    var hashTags = _.map(this.communities, function(community){
+      var parentCommunity = Communities.findOne({_id: community});
+      if(parentCommunity){
+        return parentCommunity.hashTag;
+      }
+    });
+    return hashTags.join(" ");
   }
 });
 

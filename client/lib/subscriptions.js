@@ -1,2 +1,2 @@
-//Meteor.subscribe("users");
 Meteor.subscribe("allItems");
+Meteor.subscribe("communities");

@@ -7,3 +7,8 @@ Meteor.publish("allItems", function(){
   Counts.publish(this, 'pendingItemsCount', Items.Collection.find({tweeted: false}));
   Counts.publish(this, 'tweetedItemsCount', Items.Collection.find({tweeted: true}));
 });
+
+
+Meteor.publish("communities", function(){
+  return Communities.find();
+});

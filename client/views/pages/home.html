@@ -106,7 +106,11 @@
 <template name="item">
   <tr class="{{tweetedItem}}">
     <td>{{> itemSelect}}</td>
-    <td>{{title}}</td>
+    <td>
+      {{title}}
+      <div class="divider"></div>
+      <strong>Hashtags:</strong> {{hashTags}}
+     </td>
     <td><a href="{{handle}}" target="_blank">{{handle}}</a></td>
     <td>{{lastModified}}</td>
     <td>{{importedOn}}</td>
@@ -116,7 +120,7 @@
 <template name="itemSelect">
   <div class="checkbox checkbox-primary">
     <label>
-      <input type="checkbox" name="selectItem" class="item-selected" value="{{_id}}" data-item-title="{{title}}" data-item-handle="{{handle}}"/>
+      <input type="checkbox" name="selectItem" class="item-selected" value="{{_id}}" data-item-title="{{title}}" data-item-handle="{{handle}}" data-item-hash-tags="{{hashTags}}"/>
     </label>
   </div>
   {{#if alreadyTweeted}}

@@ -18,12 +18,13 @@ Meteor.methods({
               handle: "http://hdl.handle.net/" + item.handle,
               title: item.name,
               lastModified: new Date(item.lastModified),
+              communities: getTopLevelCommunities(item.parentCommunityList),
               tweeted: false,
               importedDate: new Date()
             });
             // increment new items count
             newAdditions++;
-            // send progress precentage
+            // send progress percentage
             fetchEvent.emit("progress", newAdditions, (newAdditions/totalItems)*100 + "%");
           }
         });
@@ -33,3 +34,16 @@ Meteor.methods({
     });
   }
 });
+
+function getTopLevelCommunities(parentCommunities){
+  var communityIds = [];
+  _.each(parentCommunities, function(parentCommunity){
+    var community = Communities.findOne({name: parentCommunity.name});
+    if(community){
+      if(communityIds.indexOf(community._id) == -1){ // make sure the id is not already added
+        communityIds.push(community._id);
+      }
+    }
+  });
+  return communityIds;
+}

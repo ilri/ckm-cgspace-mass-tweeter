@@ -24,9 +24,9 @@ Meteor.methods({
 
     intervalHandle =  Meteor.setInterval(function(){
       var item = items.pop();
-      item.title = item.title.substring(0, Meteor.settings.twitter_tweet_length - item.handle.length);
+      item.title = item.title.substring(0, Meteor.settings.twitter_tweet_length - (item.handle.length + item.hashTags.length));
 
-      Twitter.postAsync(client, 'statuses/update', {status: item.title + " " + item.handle},  function(error, tweet, response){
+      Twitter.postAsync(client, 'statuses/update', {status: item.title + " " +  item.hashTags + " " + item.handle},  function(error, tweet, response){
         if(error) throw error;
         // Update item tweeted status
         Items.Collection.update({_id: item._id}, {

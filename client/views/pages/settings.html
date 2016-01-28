@@ -10,15 +10,21 @@
                     <table class="table table-striped">
                         <thead>
                         <tr>
-                            <th class="col-md-8 sortable">Name</th>
-                            <th class="col-md-4 sortable">Hash Tag</th>
+                            <th class="col-md-8">Name</th>
+                            <th class="col-md-4">Hash Tag</th>
                         </tr>
                         </thead>
                         <tbody>
                         {{#each communities}}
                             <tr>
-                                <td>{{ name}}</td>
-                                <td>{{ hashTag }}</td>
+                                <td class="col-md-8">{{ name}}</td>
+                                <td class="col-md-4 hashTag">
+                                  {{#unless editHashTagMode}}
+                                    {{ hashTag }}
+                                  {{else}}
+                                    <input id="edit-hash-tag" type="text" value="{{hashTag}}" />
+                                  {{/unless}}
+                                </td>
                             </tr>
                         {{/each}}
                         </tbody>

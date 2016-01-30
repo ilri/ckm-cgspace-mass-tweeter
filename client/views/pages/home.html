@@ -40,6 +40,10 @@
           </div>
           <div class="col-md-4">
             <div class="form-group">
+              {{> inputAutocomplete settings=tagSettings id="search-hash-tag" class="form-control"}}
+              <span class="help-block small">Filter by Hash Tag, e.g. <em>#ILRI, #CIAT</em></span>
+            </div>
+            <div class="form-group">
               {{#if showDateSearchForm }}
               {{> dateSearchForm }}
               {{else}}
@@ -110,7 +114,7 @@
       {{title}}
       <div class="divider"></div>
       <strong>Hashtags:</strong> {{hashTags}}
-     </td>
+    </td>
     <td><a href="{{handle}}" target="_blank">{{handle}}</a></td>
     <td>{{lastModified}}</td>
     <td>{{importedOn}}</td>
@@ -189,4 +193,8 @@
       </div>
     </div>
   </div>
+</template>
+
+<template name="hashTags">
+    {{hashTag}}
 </template>

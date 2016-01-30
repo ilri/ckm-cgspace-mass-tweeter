@@ -1,4 +1,5 @@
 selectedItemsCount = new ReactiveVar(0);
+searchFilter = new ReactiveVar({});
 searchField = new ReactiveVar("importedDate");
 searchFieldType = new ReactiveVar("date");
 specifySkipItems = new ReactiveVar(false);
@@ -29,6 +30,20 @@ tweetEvent.addListener('complete', function(newTweets) {
   $("#tweet-items").prop('disabled', false);
 });
 
+function getSearchHashTagFilter(searchHashTags){
+  var communityIds = Communities.find({hashTag: {$in: searchHashTags}}, {name: 0}).fetch();
+  communityIds = _.map(communityIds, function(communityId){
+    return communityId._id;
+  });
+  return {$in : communityIds};
+}
+
+function getCopy(obj){
+  var newObj = {};
+  for(var k in obj) newObj[k]=obj[k];
+  return newObj;
+}
+
 Template.home.helpers({
   totalItems: function(){
     return Counts.get("pendingItemsCount");
@@ -50,6 +65,21 @@ Template.home.helpers({
   },
   setEndpoint: function(){
     return setAPIEndpoint.get();
+  },
+  tagSettings: function() {
+    return {
+      position: "bottom",
+      limit: 5,
+      rules: [
+        {
+          token: '#',
+          collection: Communities,
+          field: "hashTag",
+          template: Template.hashTags,
+          matchAll: true
+        }
+      ]
+    };
   }
 });
 
@@ -113,7 +143,7 @@ Template.home.events({
       }
     });
   },
-  "keyup #items-to-fetch": function(e, t){
+  "keypress #items-to-fetch": function(e, t){
     if(e.keyCode == 13){
       t.$("#fetch-items").trigger("click");
     }
@@ -155,28 +185,59 @@ Template.home.events({
   "click #search-items": function(e, t){
     var selectedField = searchField.get();
     var searchTerm = t.$("#search-term").val().trim();
-    if(searchTerm){
-      var searchFilter = {};
-      searchFilter[selectedField] = {$regex : ".*"+ searchTerm +".*", $options: '-i'};
-      Items.set({
-        filters: searchFilter
-      });
-    } else {
+    var searchTermFilter = getCopy(searchFilter.get());
+
+    if(!searchTerm) {
       toastr.info("Please type in your search term");
+    } else {
+      searchTermFilter[selectedField] = {$regex : ".*"+ searchTerm +".*", $options: '-i'};
+      searchFilter.set(searchTermFilter);
+      Items.set({
+        filters: searchFilter.get()
+      });
     }
   },
-  "keyup #search-term": function(e, t){
+  "keypress #search-term": function(e, t){
+    var searchTermFilter = getCopy(searchFilter.get());
+    var selectedField = searchField.get();
+
     if(e.keyCode == 13){
       t.$("#search-items").trigger("click");
-    } else if(e.keyCode == 27){ // ESC key means reset
+    } else if(e.keyCode == 27){               // ESC key means reset
+
       e.target.value = "";
+      delete searchTermFilter[selectedField];
+      searchFilter.set(searchTermFilter);
       Items.set({
-        filters: {}
+        filters: searchFilter.get()
+      });
+    }
+  },
+  "keypress #search-hash-tag": function(e, t){
+    var searchHashTagFilter = getCopy(searchFilter.get());
+
+    if(e.keyCode == 13){
+      var searchHashTags =  t.$("#search-hash-tag").val().replace("#","").trim().split(" ");
+
+      if(searchHashTags.length == 0){
+        toastr.info("Please specify hash tag to search");
+      } else {
+        searchHashTagFilter.communities = getSearchHashTagFilter(searchHashTags);
+        searchFilter.set(searchHashTagFilter);
+        Items.set({
+          filters: searchFilter.get()
+        });
+      }
+    } else if(e.keyCode == 27){             // ESC key means reset
+      e.target.value = "";
+      delete searchHashTagFilter.communities;
+      searchFilter.set(searchHashTagFilter);
+      Items.set({
+        filters: searchFilter.get()
       });
     }
   },
   "click #tweet-items": function (e, t) {
-
     var selectedItems = _.map(t.findAll("table tr td input:checked"), function (checkbox) {
       return {
         _id: checkbox.value,
@@ -185,7 +246,7 @@ Template.home.events({
         hashTags: checkbox.dataset.itemHashTags
       };
     });
-    
+
     if(selectedItems.length > 0){
       t.$("#tweet-items").prop('disabled', true);
       Meteor.call("tweetItems", selectedItems, function(error){
@@ -221,7 +282,7 @@ Template.item.helpers({
         return parentCommunity.hashTag;
       }
     });
-    return hashTags.join(" ");
+    return "#"+hashTags.join(" #");
   }
 });
 
@@ -236,7 +297,7 @@ Template.itemSelect.helpers({
         return parentCommunity.hashTag;
       }
     });
-    return hashTags.join(" ");
+    return "#"+hashTags.join(" #");
   }
 });
 
@@ -255,6 +316,7 @@ Template.itemSelect.onRendered(function(){
 Template.dateSearchForm.events({
   "click #search-items-by-date": function(e, t){
     var selectedField = searchField.get();
+    var searchDateFilter = getCopy(searchFilter.get());
 
     var afterDateString = t.$("#search-after-date").val().trim();
     var beforeDateString = t.$("#search-before-date").val().trim();
@@ -263,7 +325,7 @@ Template.dateSearchForm.events({
       toastr.info("Please pick a date!");
     } else {
       var afterDate, beforeDate = null;
-      var searchFilter = {}
+
 
       if(afterDateString != ""){
         afterDate = moment(afterDateString, "MM/DD/YYYY h:mm A");
@@ -275,7 +337,7 @@ Template.dateSearchForm.events({
 
       if(afterDate && beforeDate){ // search in specified range
         if(beforeDate > afterDate){
-          searchFilter[selectedField] = {
+          searchDateFilter[selectedField] = {
             $gte: afterDate.toDate(),
             $lte: beforeDate.toDate()
           }
@@ -283,26 +345,32 @@ Template.dateSearchForm.events({
           toastr.info("Please make sure your selected date range is correct!");
         }
       } else if(afterDate) {     // search after specified date
-        searchFilter[selectedField] = {
+        searchDateFilter[selectedField] = {
           $gte: afterDate.toDate()
         }
       } else if(beforeDate) {   // search before specified date
-        searchFilter[selectedField] = {
+        searchDateFilter[selectedField] = {
           $lte: beforeDate.toDate()
         }
       }
     }
 
-    if(searchFilter[selectedField]){ // make sure filter is specified
+    if(searchDateFilter[selectedField]){ // make sure filter is specified
+      searchFilter.set(searchDateFilter);
       Items.set({
-        filters: searchFilter
+        filters: searchFilter.get()
       });
     }
   },
   "click #clear-search-items-by-date": function(e, t){
+    var selectedField = searchField.get();
+    var searchDateFilter = getCopy(searchFilter.get());
+
     t.$(".picker").val("");
+    delete searchDateFilter[selectedField];
+    searchFilter.set(searchDateFilter);
     Items.set({
-      filters: {}
+      filters: searchFilter.get()
     });
   }
 });

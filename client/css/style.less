@@ -112,3 +112,41 @@ section#main-content{
 div.tweets-list{
   margin-top: 20px;
 }
+
+div.-autocomplete-container{
+  ul.-autocomplete-list{
+    li.-autocomplete-item:hover, li.-autocomplete-item.selected {
+      background-color: #4caf50 !important;
+    }
+  }
+}
+
+tr {
+  td{
+    a.edit-hash-tag {
+      display: none;
+      color: #777;
+      background-color: #fff;
+      padding: 5px 10px;
+      border-radius: 100%;
+      &:hover{
+        color: #000;
+      }
+    }
+  }
+  &.selected {
+    background-color: #4caf50 !important;
+    color: #fff;
+    td {
+      a.edit-hash-tag {
+        display: inline-block;
+      }
+      input{
+        color: #333;
+      }
+    }
+  }
+}
+
+
+

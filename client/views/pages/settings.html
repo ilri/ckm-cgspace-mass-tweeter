@@ -10,20 +10,21 @@
                     <table class="table table-striped">
                         <thead>
                         <tr>
-                            <th class="col-md-8">Name</th>
-                            <th class="col-md-4">Hash Tag</th>
+                            <th class="col-md-8 hidden-xs">Name</th>
+                            <th class="col-md-4 hidden-xs">Hash Tag</th>
                         </tr>
                         </thead>
                         <tbody>
                         {{#each communities}}
-                            <tr>
-                                <td class="col-md-8">{{ name}}</td>
-                                <td class="col-md-4 hashTag">
-                                  {{#unless editHashTagMode}}
-                                    {{ hashTag }}
-                                  {{else}}
-                                    <input id="edit-hash-tag" type="text" value="{{hashTag}}" />
-                                  {{/unless}}
+                            <tr class="{{selectedRow}}">
+                                <td class="col-md-8">
+                                    <strong class="hidden-sm hidden-md hidden-lg">Name:</strong> {{ name}}
+                                    <div class="visible-xs">
+                                        {{> communityHashTags }}
+                                    </div>
+                                </td>
+                                <td class="col-md-4 hashTag hidden-xs">
+                                    {{> communityHashTags }}
                                 </td>
                             </tr>
                         {{/each}}
@@ -33,4 +34,17 @@
             </div>
         </div>
     </div>
+</template>
+
+<template name="communityHashTags">
+    <strong class="hidden-sm hidden-md hidden-lg">HashTags:</strong>
+    {{#unless editHashTagMode}}
+        #{{ hashTag }} <a class="edit-hash-tag" href="#"><i class="fa fa-pencil"></i></a>
+    {{else}}
+        # {{> communityHashTagsEditForm}}
+    {{/unless}}
+</template>
+
+<template name="communityHashTagsEditForm">
+    <input id="edit-hash-tag" type="text" value="{{hashTag}}"  autofocus="autofocus" />
 </template>

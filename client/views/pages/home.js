@@ -84,7 +84,7 @@ Template.home.helpers({
 });
 
 Template.home.events({
-  "change #all-items": function (e, t) {
+  "change #all-items": function (e, t){
     if (e.target.checked) {
       t.$("table tbody tr>td input").prop("checked", true);
       Session.set("isNotificationSelected", true);

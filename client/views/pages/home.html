@@ -1,200 +1,272 @@
 <template name="home">
-  {{> navbar }}
-  <div class="row">
-    <div class="col-md-3">
-      <div class="panel panel-success">
-        <div class="panel-heading"><h5>Quick Stats</h5></div>
-        <div class="panel-body">
-          <p>Total Entries: {{totalItems}}</p>
-          <p>Total Tweets: {{totalTweetedItems}}</p>
+    {{> navbar }}
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-success">
+                <div class="panel-heading"><h5>Quick Stats</h5></div>
+                <div class="panel-body">
+                    <p>Total Entries: {{totalItems}}</p>
+                    <p>Total Tweets: {{totalTweetedItems}}</p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="col-md-9">
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <div class="col-md-4">
-            {{> setAPIEndpointOption }}
-            {{#if setEndpoint }}
-            <div class="form-group">
-              <input type="text" id="endpoint" class="form-control" />
-              <span class="help-block small">Set the CGSpace API endpoint.</span>
+        <div class="col-md-9">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="col-md-4">
+                        {{> setAPIEndpointOption }}
+                        {{#if setEndpoint }}
+                            <div class="form-group">
+                                <input type="text" id="endpoint" class="form-control" />
+                                <span class="help-block small">Set the CGSpace API endpoint.</span>
+                            </div>
+                        {{/if}}
+                        {{> skipSpecifyOption }}
+                        {{#if skipItems}}
+                            <div class="form-group">
+                                <input type="number" id="items-to-skip" class="form-control" min="0" max="49950" value="0"/>
+                                <span class="help-block small">Items to Skip (0 - ~49,950).</span>
+                            </div>
+                        {{/if}}
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="number" id="items-to-fetch" class="form-control" min="1" max="100" value="1"/>
+                                <span class="input-group-btn">
+                                  <button id="fetch-items" class="btn btn-success" type="button"><i class="fa fa-refresh"></i></button>
+                                </span>
+                            </div>
+                            <span class="help-block small">Fetch Items (1 - 100).</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        {{> showItemsWithDOIOnlyOption }}
+                        <div class="form-group">
+                            <input id="search-hashtags-and-mentions" class="form-control"/>
+                            <span class="help-block small">Filter by hashtags or mentions, e.g. <em>#ILRI, @CTAflash</em> <i id="hashtags-and-mentions-button" class="fa fa-info-circle" data-toggle="modal" data-target="#hashtags-and-mentions-modal"></i></span>
+                        </div>
+                        <div class="form-group">
+                            {{#if showDateSearchForm }}
+                                {{> dateSearchForm }}
+                            {{else}}
+                                <div class="input-group">
+                                    <input type="text" id="search-term" class="form-control"/>
+                                    <span class="input-group-btn">
+                                      <button id="search-items" class="btn btn-success" type="button"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div>
+                                <span class="help-block small">Search items (<em>{{selectedSearchField}}</em>). Press <strong>ESC</strong> to clear.</span>
+                            {{/if}}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <p>Selected Entries: {{ selectedItemsCount }}</p>
+                        <button id="tweet-items" class="btn btn-success btn-large" href="#"><i class="fa fa-twitter"></i> Tweet</button>
+                    </div>
+                </div>
             </div>
-            {{/if}}
-            {{> skipSpecifyOption }}
-            {{#if skipItems}}
-            <div class="form-group">
-              <input type="number" id="items-to-skip" class="form-control" min="0" max="49950" value="0"/>
-              <span class="help-block small">Items to Skip (0 - ~49,950).</span>
-            </div>
-            {{/if}}
-            <div class="form-group">
-              <div class="input-group">
-                <input type="number" id="items-to-fetch" class="form-control" min="1" max="100" value="1"/>
-                <span class="input-group-btn">
-                  <button id="fetch-items" class="btn btn-success" type="button"><i class="fa fa-refresh"></i></button>
-                </span>
-              </div>
-              <span class="help-block small">Fetch Items (1 - 100).</span>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="form-group">
-              {{> inputAutocomplete settings=tagSettings id="search-hash-tag" class="form-control"}}
-              <span class="help-block small">Filter by Hash Tag, e.g. <em>#ILRI, #CIAT</em></span>
-            </div>
-            <div class="form-group">
-              {{#if showDateSearchForm }}
-              {{> dateSearchForm }}
-              {{else}}
-              <div class="input-group">
-                <input type="text" id="search-term" class="form-control"/>
-                <span class="input-group-btn">
-                  <button id="search-items" class="btn btn-success" type="button"><i class="fa fa-search"></i></button>
-                </span>
-              </div>
-              <span class="help-block small">Search items (<em>{{selectedSearchField}}</em>). Press <strong>ESC</strong> to clear.</span>
-              {{/if}}
-            </div>
-          </div>
-          <div class="col-md-4 text-right">
-            <p>Selected Entries: {{ selectedItemsCount }}</p>
-            <button id="tweet-items" class="btn btn-success btn-large" href="#"><i class="fa fa-twitter"></i> Tweet</button>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-  {{> items}}
-  {{> tweetInfoModal}}
+    {{> items}}
+    {{> tweetInfoModal}}
+    {{> hashtagsAndMentions}}
 </template>
 
 <template name="items">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="panel panel-default">
-        <div class="panel-header">
-          {{> pagesNav}}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-header">
+                    {{> pagesNav}}
+                </div>
+                <div class="panel-body">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th class="col-md-1 col-sm-1">
+                                <div class="checkbox checkbox-primary">
+                                    <label for="all-items">
+                                        <input type="checkbox" name="selectAll" id="all-items"/> All
+                                    </label>
+                                </div>
+                            </th>
+                            <th class="col-md-4 col-sm-4 sortable hidden-xs" data-sort-field="title" data-sort-field-type="text" >Title</th>
+                            <th class="col-md-3 col-sm-3 sortable hidden-xs" data-sort-field="handle" data-sort-field-type="text">Handle</th>
+                            <th class="col-md-2 col-sm-2 sortable active hidden-xs hidden-sm" data-sort-field="dateIssued" data-sort-field-type="date">Date Issued
+                                <div id="sorter" class="pull-right">
+                                    <i class="fa fa-chevron-circle-up"></i><i class="fa fa-chevron-circle-down active"></i>
+                                </div>
+                            </th>
+                            <th class="col-md-2 col-sm-2 sortable hidden-xs hidden-sm" data-sort-field="importedDate" data-sort-field-type="date">Imported On</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{> pages}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div class="panel-body">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th class="col-md-1">
-                  <div class="checkbox checkbox-primary">
-                    <label>
-                      <input type="checkbox" name="selectAll" id="all-items"/> All
-                    </label>
-                  </div>
-                </th>
-                <th class="col-md-4 sortable" data-sort-field="title" data-sort-field-type="text" >Title</th>
-                <th class="col-md-3 sortable" data-sort-field="handle" data-sort-field-type="text">Handle</th>
-                <th class="col-md-2 sortable" data-sort-field="lastModified" data-sort-field-type="date">Last Modified</th>
-                <th class="col-md-2 sortable active" data-sort-field="importedDate" data-sort-field-type="date">Imported On
-                  <div id="sorter" class="pull-right">
-                    <i class="fa fa-chevron-circle-up"></i><i class="fa fa-chevron-circle-down active"></i>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {{> pages}}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <template name="item">
-  <tr class="{{tweetedItem}}">
-    <td>{{> itemSelect}}</td>
-    <td>
-      {{title}}
-      <div class="divider"></div>
-      <strong>Hashtags:</strong> {{hashTags}}
-    </td>
-    <td><a href="{{handle}}" target="_blank">{{handle}}</a></td>
-    <td>{{lastModified}}</td>
-    <td>{{importedOn}}</td>
-  </tr>
+    <tr class="{{tweetedItem}} {{itemWithDOI}}">
+        <td>{{> itemSelect}}</td>
+        <td>
+            {{title}}
+            <div class="hashtag">
+                <strong>Hashtags:</strong> {{hashtags}}
+            </div>
+            <div class="hashtag">
+                <strong>Mentions:</strong> {{mentions}}
+            </div>
+            <div class="handle visible-xs">
+                <strong>Handle:</strong> <a href="{{handle}}" target="_blank">{{handle}}</a>
+            </div>
+            {{#if doi}}
+                <div class="doi">
+                    <strong>DOI:</strong> <a href="{{doi}}" target="_blank">{{doi}}</a>
+                </div>
+            {{/if}}
+            <div class="last-modified visible-xs visible-sm">
+                <strong>Date Issued:</strong> {{issuedOn}}
+            </div>
+            <div class="imported-on visible-xs visible-sm">
+                <strong>Imported On:</strong> {{importedOn}}
+            </div>
+        </td>
+        <td class="hidden-xs">
+            <a href="{{handle}}" target="_blank">{{handle}}</a>
+        </td>
+        <td class="hidden-xs hidden-sm">{{issuedOn}}</td>
+        <td class="hidden-xs hidden-sm">{{importedOn}}</td>
+    </tr>
 </template>
 
 <template name="itemSelect">
-  <div class="checkbox checkbox-primary">
-    <label>
-      <input type="checkbox" name="selectItem" class="item-selected" value="{{_id}}" data-item-title="{{title}}" data-item-handle="{{handle}}" data-item-hash-tags="{{hashTags}}"/>
-    </label>
-  </div>
-  {{#if alreadyTweeted}}
-  <i class="fa fa-info-circle" data-toggle="modal" data-target="#tweetInfoModal"></i>
-  {{/if}}
+    <div class="checkbox checkbox-primary">
+        <label for="{{_id}}">
+            <input id="{{_id}}" type="checkbox" name="selectItem" class="item-selected" value="{{_id}}" data-item-title="{{title}}" data-item-handle="{{handle}}" data-item-hashtags="{{hashtags}}" data-item-mentions="{{mentions}}"/>
+        </label>
+    </div>
+    {{#if alreadyTweeted}}
+        <i class="fa fa-info-circle" data-toggle="modal" data-target="#tweetInfoModal"></i>
+    {{/if}}
 </template>
 
 <template name="dateSearchForm">
-  <div class="input-group datetimepicker">
-    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-    <input id="search-after-date" class="form-control picker" type="text"/>
-    <span class="help-block small">Pick <strong>After</strong> date.</span>
-  </div>
-  <div class="input-group datetimepicker">
-    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-    <input id="search-before-date" class="form-control picker" type="text"/>
-    <span class="help-block small">Pick <strong>Before</strong> date.</span>
-  </div>
-  <div>
-    <button id="search-items-by-date" class="btn btn-success" type="button"><i class="fa fa-search"></i></button>
-    <button id="clear-search-items-by-date" class="btn btn-success" type="button"><i class="fa fa-times-circle"></i></button>
-  </div>
-  <div>
-    <span class="help-block small">Search items (<em>{{selectedSearchField}}</em>).</span>
-  </div>
+    <div class="input-group datetimepicker">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input id="search-after-date" class="form-control picker" type="text"/>
+        <span class="help-block small">Pick <strong>After</strong> date.</span>
+    </div>
+    <div class="input-group datetimepicker">
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+        <input id="search-before-date" class="form-control picker" type="text"/>
+        <span class="help-block small">Pick <strong>Before</strong> date.</span>
+    </div>
+    <div>
+        <button id="search-items-by-date" class="btn btn-success" type="button"><i class="fa fa-search"></i></button>
+        <button id="clear-search-items-by-date" class="btn btn-success" type="button"><i class="fa fa-times-circle"></i></button>
+    </div>
+    <div>
+        <span class="help-block small">Search items (<em>{{selectedSearchField}}</em>).</span>
+    </div>
 </template>
 
 <template name="skipSpecifyOption">
-  <div class="form-group">
-    <div class="checkbox checkbox-primary">
-      <label>
-        <input type="checkbox" name="selectAll" id="skip-items"/> Specify Items to skip
-      </label>
+    <div class="form-group">
+        <div class="checkbox checkbox-primary">
+            <label for="skip-items">
+                <input type="checkbox" name="selectAll" id="skip-items"/> Specify Items to skip
+            </label>
+        </div>
     </div>
-  </div>
 </template>
 
 <template name="setAPIEndpointOption">
-  <div class="form-group">
-    <div class="checkbox checkbox-primary">
-      <label>
-        <input type="checkbox" name="selectAll" id="set-endpoint"/> Set API Endpoint
-      </label>
+    <div class="form-group">
+        <div class="checkbox checkbox-primary">
+            <label for="set-endpoint">
+                <input type="checkbox" name="selectAll" id="set-endpoint"/> Set API Endpoint
+            </label>
+        </div>
     </div>
-  </div>
+</template>
+
+<template name="showItemsWithDOIOnlyOption">
+    <div class="form-group">
+        <div class="checkbox checkbox-primary">
+            <label for="doi-items">
+                <input type="checkbox" name="doiItems" id="doi-items"/> Show Items with DOI only
+            </label>
+        </div>
+    </div>
 </template>
 
 <template name="tweetInfoModal">
-  <div class="modal fade" id="tweetInfoModal" tabindex="-1" role="dialog" aria-labelledby="tweetInfoModal">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title" id="myModalLabel">Who's Tweeted this Item?</h4>
+    <div class="modal fade" id="tweetInfoModal" tabindex="-1" role="dialog" aria-labelledby="tweetInfoModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Who's Tweeted this Item?</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="tweets-list">
+                        {{#each tweets}}
+                            <p><a href="https://twitter.com/{{tweeter}}" target="_blank">@{{tweeter}}</a> - {{tweetedDate}}</p>
+                        {{/each}}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <div class="tweets-list">
-            {{#each tweets}}
-            <p><a href="https://twitter.com/{{tweeter}}" target="_blank">@{{tweeter}}</a> - {{tweetedDate}}</p>
-            {{/each}}
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <template name="hashTags">
-    {{hashTag}}
+    {{hashtag}}
+</template>
+
+<template name="hashtagsAndMentions">
+    <div class="modal fade" id="hashtags-and-mentions-modal" tabindex="-1" role="dialog" aria-labelledby="hashtagsAndMentions">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Available Hashtags and Mentions</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-6 reference-list">
+                            <div>
+                                {{#each hashtagsArray}}
+                                    <p><a href="{{hashtagsURL}}" target="_blank">{{hashtagsString}}</a></p>
+                                {{/each}}
+                            </div>
+                            {{#if shouldScrollHashtagsList}}
+                                <p class="small">Scroll down to see more</p>
+                            {{/if}}
+                        </div>
+                        <div class="col-xs-6 reference-list">
+                            <div>
+                                {{#each mentionsArray}}
+                                    <p><a href="{{mentionsURL}}" target="_blank">{{mentionsString}}</a></p>
+                                {{/each}}
+                            </div>
+                            {{#if shouldScrollMentionsList}}
+                                <p class="small">Scroll down to see more</p>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>

@@ -6,28 +6,36 @@ specifySkipItems = new ReactiveVar(false);
 setAPIEndpoint = new ReactiveVar(false);
 tweetInfo = new ReactiveVar();
 
-fetchEvent.addListener('progress', function(newAdditions, percentage) {
-    $("#items-imported").text(newAdditions);
-    $("#items-progress").css({
-        width: percentage
-    })
+fetchEvent.addListener('progress', function(userId, newAdditions, percentage) {
+    if(Meteor.userId() == userId){
+        $("#items-imported").text(newAdditions);
+        $("#items-progress").css({
+            width: percentage
+        });
+    }
 });
 
-fetchEvent.addListener('complete', function(newAdditions) {
-    toastr.success(newAdditions + " CGSpace items imported", "Success!", {timeOut: 0, "extendedTimeOut": 0});
-    $("#fetch-items").prop('disabled', false);
+fetchEvent.addListener('complete', function(userId, newAdditions) {
+    if(Meteor.userId() == userId) {
+        toastr.success(newAdditions + " CGSpace items imported", "Success!", {timeOut: 0, "extendedTimeOut": 0});
+        $("#fetch-items").prop('disabled', false);
+    }
 });
 
-tweetEvent.addListener('progress', function(newTweets, percentage) {
-    $("#items-tweeted").text(newTweets);
-    $("#tweets-progress").css({
-        width: percentage
-    })
+tweetEvent.addListener('progress', function(userId, newTweets, percentage) {
+    if(Meteor.userId() == userId) {
+        $("#items-tweeted").text(newTweets);
+        $("#tweets-progress").css({
+            width: percentage
+        });
+    }
 });
 
-tweetEvent.addListener('complete', function(newTweets) {
-    toastr.success(newTweets + " CGSpace items tweeted", "Success!", {timeOut: 0, "extendedTimeOut": 0});
-    $("#tweet-items").prop('disabled', false);
+tweetEvent.addListener('complete', function(userId, newTweets) {
+    if(Meteor.userId() == userId) {
+        toastr.success(newTweets + " CGSpace items tweeted", "Success!", {timeOut: 0, "extendedTimeOut": 0});
+        $("#tweet-items").prop('disabled', false);
+    }
 });
 
 getItemHashtags = function(item){
@@ -265,13 +273,18 @@ Template.home.events({
     },
     "click #tweet-items": function (e, t) {
         var selectedItems = _.map(t.findAll("table tr td input:checked"), function (checkbox) {
-            return {
+            var selectedItem = {
                 _id: checkbox.value,
                 title: checkbox.dataset.itemTitle,
-                handle: checkbox.dataset.itemHandle,
-                hashtags: checkbox.dataset.itemHashtags,
-                mentions: checkbox.dataset.itemMentions
+                handle: checkbox.dataset.itemHandle
             };
+            if(checkbox.dataset.itemHashtags != "N/A"){
+                selectedItem.hashtags = checkbox.dataset.itemHashtags;
+            }
+            if(checkbox.dataset.itemMentions != "N/A"){
+                selectedItem.mentions = checkbox.dataset.itemMentions;
+            }
+            return selectedItem;
         });
 
         if(selectedItems.length > 0){

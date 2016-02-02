@@ -83,7 +83,7 @@ Meteor.startup(function(){
         },
         {
             name: "International Potato Center (CIP)",
-            hashtags: ["CIP", "potato"]
+            hashtags: ["CIPotato"]
         },
         {
             name: "International Water Management Institute (IWMI)",

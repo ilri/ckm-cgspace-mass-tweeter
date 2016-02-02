@@ -10,21 +10,26 @@
                     <table class="table table-striped">
                         <thead>
                         <tr>
-                            <th class="col-md-8 hidden-xs">Name</th>
-                            <th class="col-md-4 hidden-xs">Hash Tag</th>
+                            <th class="col-md-7 hidden-xs">Name</th>
+                            <th class="col-md-3 hidden-xs"># Hashtags</th>
+                            <th class="col-md-2 hidden-xs">@ Mentions</th>
                         </tr>
                         </thead>
                         <tbody>
                         {{#each communities}}
                             <tr class="{{selectedRow}}">
-                                <td class="col-md-8">
+                                <td class="col-md-7">
                                     <strong class="hidden-sm hidden-md hidden-lg">Name:</strong> {{ name}}
                                     <div class="visible-xs">
-                                        {{> communityHashTags }}
+                                        {{> communityHashtags }}
+                                        {{> communityMentions }}
                                     </div>
                                 </td>
-                                <td class="col-md-4 hashTag hidden-xs">
-                                    {{> communityHashTags }}
+                                <td class="col-md-3 hashTag hidden-xs">
+                                    {{> communityHashtags }}
+                                </td>
+                                <td class="col-md-2 hashTag hidden-xs">
+                                    {{> communityMentions }}
                                 </td>
                             </tr>
                         {{/each}}
@@ -36,15 +41,32 @@
     </div>
 </template>
 
-<template name="communityHashTags">
-    <strong class="hidden-sm hidden-md hidden-lg">HashTags:</strong>
-    {{#unless editHashTagMode}}
-        #{{ hashTag }} <a class="edit-hash-tag" href="#"><i class="fa fa-pencil"></i></a>
-    {{else}}
-        # {{> communityHashTagsEditForm}}
-    {{/unless}}
+<template name="communityHashtags">
+    <div>
+        <strong class="hidden-sm hidden-md hidden-lg">Hashtags:</strong>
+        {{#unless editHashtagsMode}}
+            {{ hashtagsString }} <a class="edit-hashtags-button" href="#"><i class="fa fa-pencil"></i></a>
+        {{else}}
+            {{> communityHashtagsEditForm}}
+        {{/unless}}
+    </div>
 </template>
 
-<template name="communityHashTagsEditForm">
-    <input id="edit-hash-tag" type="text" value="{{hashTag}}"  autofocus="autofocus" />
+<template name="communityHashtagsEditForm">
+    <input id="edit-hashtags" type="text" value="{{hashtagsString}}"  autofocus="autofocus" />
+</template>
+
+<template name="communityMentions">
+    <div>
+        <strong class="hidden-sm hidden-md hidden-lg">Mentions:</strong>
+        {{#unless editMentionsMode}}
+            {{ mentionsString }} <a class="edit-mentions-button" href="#"><i class="fa fa-pencil"></i></a>
+        {{else}}
+            {{> communityMentionsEditForm}}
+        {{/unless}}
+    </div>
+</template>
+
+<template name="communityMentionsEditForm">
+    <input id="edit-mentions" type="text" value="{{mentionsString}}"  autofocus="autofocus" />
 </template>

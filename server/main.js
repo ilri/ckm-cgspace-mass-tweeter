@@ -3,123 +3,111 @@ Meteor.startup(function(){
     var communities = [
         {
             name: "Africa RISING",
-            hashTag: "africarising"
+            hashtags: ["IITA", "ILRI"]
         },
         {
             name: "AgriFood Chain Toolkit",
-            hashTag: "agrifood"
+            hashtags: ["agrifoodchain"]
         },
         {
             name: "Animal Genetic Resources Virtual Library",
-            hashTag: "agrvl"
+            hashtags: ["ILRI", "genetics"]
         },
         {
             name: "Bioversity International",
-            hashTag: "bioversity"
+            hashtags: ["BioversityInt", "CGIAR"]
         },
         {
             name: "Center for International Forestry Research (CIFOR)",
-            hashTag: "cifor"
+            hashtags: ["CIFOR", "CGIAR"]
         },
         {
             name: "CGIAR Challenge Program on Water and Food (CPWF)",
-            hashTag: "cpwf"
-        },
-        {
-            name: "CGIAR Collective Action in Eastern and Southern Africa",
-            hashTag: "caesa"
+            hashtags: ["CPWF"]
         },
         {
             name: "CGIAR Gender and Agriculture Research Network",
-            hashTag: "garn"
-        },
-        {
-            name: "CGIAR Global Mountain Program",
-            hashTag: "gmp"
+            hashtags: ["CGIAR", "gender"]
         },
         {
             name: "CGIAR Research Program on Climate Change, Agriculture and Food Security (CCAFS)",
-            hashTag: "ccafs"
+            hashtags: ["CCAFS"]
         },
         {
             name: "CGIAR Research Program on Dryland Systems",
-            hashTag: "drylandsystems"
+            hashtags: ["CGIAR", "drylands"]
         },
         {
             name: "CGIAR Research Program on Livestock and Fish",
-            hashTag: "crp37"
+            hashtags: ["CGIAR", "livestock", "fish"]
         },
         {
             name: "CGIAR Research Program on Water, Land and Ecosystems (WLE)",
-            hashTag: "wle"
+            hashtags: ["CGIAR", "WLE"]
         },
         {
             name: "CGIAR System-wide Livestock Programme",
-            hashTag: "slp"
-        },
-        {
-            name: "Center for International Forestry Research (CIFOR)",
-            hashTag: "cifor"
+            hashtags: ["CGIAR", "livestock"]
         },
         {
             name: "East Africa Dairy Development Project",
-            hashTag: "eadd"
+            hashtags: ["EADD", "dairying"]
         },
         {
             name: "Feed the Future Innovation Lab for Small-Scale Irrigation",
-            hashTag: "ilssi"
+            hashtags: ["ILSSI", "irrigation"]
         },
         {
             name: "Humidtropics, a CGIAR Research Program",
-            hashTag: "humidtropics"
+            hashtags: ["CGIAR", "humidtropics"]
         },
         {
             name: "IGAD Livestock Policy Initiative",
-            hashTag: "igad"
+            hashtags: ["IGAD", "livestock"]
         },
         {
             name: "International Center for Agricultural Research in the Dry Areas (ICARDA)",
-            hashTag: "icarda"
+            hashtags: ["ICARDA", "drylands"]
         },
         {
             name: "International Center for Tropical Agriculture (CIAT)",
-            hashTag: "ciat"
+            hashtags: ["CIAT", "CGIAR"]
         },
         {
             name: "International Institute of Tropical Agriculture (IITA)",
-            hashTag: "iita"
+            hashtags: ["IITA", "CGIAR"]
         },
         {
             name: "International Livestock Research Institute (ILRI)",
-            hashTag: "ilri"
+            hashtags: ["ILRI", "livestock"]
         },
         {
             name: "International Potato Center (CIP)",
-            hashTag: "cip"
+            hashtags: ["CIP", "potato"]
         },
         {
             name: "International Water Management Institute (IWMI)",
-            hashTag: "iwmi"
+            hashtags: ["IWMI", "CGIAR"]
         },
         {
             name: "Livestock and Irrigation Value Chains for Ethiopian Smallholders (LIVES)",
-            hashTag: "lives"
+            hashtags: ["ILRI", "ethiopia"]
         },
         {
             name: "Technical Centre for Agricultural and Rural Cooperation (CTA)",
-            hashTag: "cta"
+            mentions: ["CTAflash"]
         },
         {
             name: "Technical Consortium for Building Resilience to Drought in the Horn of Africa",
-            hashTag: "ctbrd"
+            hashtags: ["CGIAR", "IGAD"]
         }
     ];
 
     // Add to database if not already available
     _.each(communities, function(community){
-       if(Communities.find({name: community.name}).count() == 0){
-           Communities.insert(community);
-       }
+        if(Communities.find({name: community.name}).count() == 0){
+            Communities.insert(community);
+        }
     });
 
 });

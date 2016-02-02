@@ -10,5 +10,7 @@ Meteor.publish("allItems", function(){
 
 
 Meteor.publish("communities", function(){
+  Counts.publish(this, 'communitiesWithHashtags', Communities.find({hashtags: {$exists: true}}));
+  Counts.publish(this, 'communitiesWithMentions', Communities.find({mentions: {$exists: true}}));
   return Communities.find();
 });

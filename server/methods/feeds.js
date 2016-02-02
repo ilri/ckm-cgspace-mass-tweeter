@@ -44,11 +44,11 @@ Meteor.methods({
                         // increment new items count
                         newAdditions++;
                         // send progress percentage
-                        fetchEvent.emit("progress", newAdditions, (newAdditions/totalItems)*100 + "%");
+                        fetchEvent.emit("progress", Meteor.userId(), newAdditions, (newAdditions/totalItems)*100 + "%");
                     }
                 });
                 // send completed adding items event
-                fetchEvent.emit("complete", newAdditions);
+                fetchEvent.emit("complete",  Meteor.userId(), newAdditions);
             }
         });
     }

@@ -265,13 +265,18 @@ Template.home.events({
     },
     "click #tweet-items": function (e, t) {
         var selectedItems = _.map(t.findAll("table tr td input:checked"), function (checkbox) {
-            return {
+            var selectedItem = {
                 _id: checkbox.value,
                 title: checkbox.dataset.itemTitle,
-                handle: checkbox.dataset.itemHandle,
-                hashtags: checkbox.dataset.itemHashtags,
-                mentions: checkbox.dataset.itemMentions
+                handle: checkbox.dataset.itemHandle
             };
+            if(checkbox.dataset.itemHashtags != "N/A"){
+                selectedItem.hashtags = checkbox.dataset.itemHashtags;
+            }
+            if(checkbox.dataset.itemMentions != "N/A"){
+                selectedItem.mentions = checkbox.dataset.itemMentions;
+            }
+            return selectedItem;
         });
 
         if(selectedItems.length > 0){

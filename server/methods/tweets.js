@@ -1,42 +1,68 @@
 intervalHandle = null;
 tweetSettings = new ReactiveVar({});
 
-tweetItem = function(){
+itemTitle = function(item){
+    var remainingStatusLength = item.handle.length;
+    remainingStatusLength += item.hashtags ? item.hashtags.length : 0;
+    remainingStatusLength += item.mentions ? item.mentions.length : 0;
+    return item.title.substring(0, Meteor.settings.twitter_tweet_length - remainingStatusLength);
+};
+
+itemStatus = function(item){
+    var status = itemTitle(item);
+    status = item.hashtags ? status + " " + item.hashtags : status;
+    status = item.mentions ? status + " " + item.mentions : status;
+    return status + " " + item.handle;
+};
+
+tweetItem = function() {
     var settings = tweetSettings.get();
-    var item = settings.items.pop();
 
-    item.title = item.title.substring(0, Meteor.settings.twitter_tweet_length - (item.handle.length + item.hashtags.length + item.mentions.length + 3));
-    var statusText = item.title + " " +  item.hashtags + " " +  item.mentions + " " + item.handle;
+    if (settings.items && settings.items.length > 0) {
+        var item = settings.items.pop();
 
-    Twitter.postAsync(settings.client, 'statuses/update', {status: statusText},  function(error){
-        if(error) throw error;
-        // Update item tweeted status
-        Items.Collection.update({_id: item._id}, {
-            $set: { tweeted: true },
-            $push: {
-                tweets: {
-                    tweeter: settings.userName,
-                    tweetedOn: new Date()
+        Twitter.postAsync(settings.client, 'statuses/update', {status: itemStatus(item)}, function (error) {
+            if (error) throw error;
+            // Update item tweeted status
+            Items.Collection.update({_id: item._id}, {
+                $set: {tweeted: true},
+                $push: {
+                    tweets: {
+                        tweeter: settings.userName,
+                        tweetedOn: new Date()
+                    }
                 }
+            });
+            // increment Tweets count
+            settings.newTweets++;
+
+            // send progress percentage
+            tweetEvent.emit("progress", settings.newTweets, (settings.newTweets / settings.totalItems) * 100 + "%");
+
+            // update tweet setting
+            tweetSettings.set(settings);
+
+            if(tweetSettings.get().items.length == 0){
+                // send tweeting completed event
+                tweetEvent.emit("complete", settings.newTweets);
+
+                // clear tweet setting
+                tweetSettings.set({});
+
+                // Break set interval
+                Meteor.clearInterval(intervalHandle);
             }
         });
-        // increment Tweets count
-        settings.newTweets++;
-        // send progress percentage
-        tweetEvent.emit("progress", settings.newTweets, (settings.newTweets/settings.totalItems)*100 + "%");
+    } else {
+        // send tweeting completed event
+        tweetEvent.emit("complete", settings.newTweets);
 
-        if(settings.items.length == 0){
-            // send tweeting completed event
-            tweetEvent.emit("complete", settings.newTweets);
-        }
-    });
+        // clear tweet setting
+        tweetSettings.set({});
 
-    if(settings.items.length == 0){
         // Break set interval
         Meteor.clearInterval(intervalHandle);
     }
-
-    tweetSettings.set(settings);
 };
 
 Meteor.methods({
@@ -59,6 +85,10 @@ Meteor.methods({
         tweetSettings.set(settings);
         tweetItem();
 
-        intervalHandle =  Meteor.setInterval(tweetItem, Meteor.settings.twitter_tweet_delay); // Delay 37 seconds before sending
+        // check if there are more items
+        if(tweetSettings.get().items){
+            intervalHandle =  Meteor.setInterval(tweetItem, Meteor.settings.twitter_tweet_delay); // Delay 37 seconds before sending
+        }
+
     }
 });

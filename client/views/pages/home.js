@@ -269,7 +269,8 @@ Template.home.events({
                 _id: checkbox.value,
                 title: checkbox.dataset.itemTitle,
                 handle: checkbox.dataset.itemHandle,
-                hashtags: checkbox.dataset.itemhashtags
+                hashtags: checkbox.dataset.itemHashtags,
+                mentions: checkbox.dataset.itemMentions
             };
         });
 

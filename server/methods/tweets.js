@@ -37,14 +37,14 @@ tweetItem = function() {
             settings.newTweets++;
 
             // send progress percentage
-            tweetEvent.emit("progress", settings.newTweets, (settings.newTweets / settings.totalItems) * 100 + "%");
+            tweetEvent.emit("progress",  settings.userId, settings.newTweets, (settings.newTweets / settings.totalItems) * 100 + "%");
 
             // update tweet setting
             tweetSettings.set(settings);
 
             if(tweetSettings.get().items.length == 0){
                 // send tweeting completed event
-                tweetEvent.emit("complete", settings.newTweets);
+                tweetEvent.emit("complete", settings.userId, settings.newTweets);
 
                 // clear tweet setting
                 tweetSettings.set({});
@@ -53,15 +53,6 @@ tweetItem = function() {
                 Meteor.clearInterval(intervalHandle);
             }
         });
-    } else {
-        // send tweeting completed event
-        tweetEvent.emit("complete", settings.newTweets);
-
-        // clear tweet setting
-        tweetSettings.set({});
-
-        // Break set interval
-        Meteor.clearInterval(intervalHandle);
     }
 };
 
@@ -73,6 +64,7 @@ Meteor.methods({
             items: items,
             totalItems: items.length,
             newTweets: 0,
+            userId: Meteor.userId(),
             userName: Meteor.user().services.twitter.screenName,
             client: new Twitter({
                 consumer_key: Meteor.settings.twitter_consumer_key,

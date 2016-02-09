@@ -92,6 +92,22 @@ findTokens = function (token, searchText) {
     });
 };
 
+adjustPager = function(){
+    if ($(window).width() < 405) {
+        Items.set({
+            paginationMargin: 0
+        });
+    } else if ($(window).width() >= 405 && $(window).width() < 768) {
+        Items.set({
+            paginationMargin: 1
+        });
+    } else {
+        Items.set({
+            paginationMargin: 3
+        });
+    }
+}
+
 Template.home.helpers({
     totalItems: function () {
         return Counts.get("pendingItemsCount");
@@ -342,6 +358,10 @@ Template.home.events({
 
 Template.home.onRendered(function () {
     $.material.init();
+    adjustPager();
+    $(window).resize(function(){
+       adjustPager(); 
+    });
 });
 
 Template.item.helpers({

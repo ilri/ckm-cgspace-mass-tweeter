@@ -39,7 +39,8 @@ Meteor.startup(function(){
         },
         {
             name: "CGIAR Research Program on Livestock and Fish",
-            hashtags: ["CGIAR", "livestock", "fish"]
+            hashtags: ["CGIAR"],
+            mentions: ["crp37"]
         },
         {
             name: "CGIAR Research Program on Water, Land and Ecosystems (WLE)",

@@ -2,12 +2,13 @@ selectedItemsCount = new ReactiveVar(0);
 searchFilter = new ReactiveVar({});
 searchField = new ReactiveVar("dateIssued");
 searchFieldType = new ReactiveVar("date");
-specifySkipItems = new ReactiveVar(false);
+setOffset = new ReactiveVar(false);
 setAPIEndpoint = new ReactiveVar(false);
 tweetInfo = new ReactiveVar();
+filteredByHashtagsOrMentions = new ReactiveVar(false);
 
-fetchEvent.addListener('progress', function(userId, newAdditions, percentage) {
-    if(Meteor.userId() == userId){
+fetchEvent.addListener('progress', function (userId, newAdditions, percentage) {
+    if (Meteor.userId() == userId) {
         $("#items-imported").text(newAdditions);
         $("#items-progress").css({
             width: percentage
@@ -15,15 +16,15 @@ fetchEvent.addListener('progress', function(userId, newAdditions, percentage) {
     }
 });
 
-fetchEvent.addListener('complete', function(userId, newAdditions) {
-    if(Meteor.userId() == userId) {
+fetchEvent.addListener('complete', function (userId, newAdditions) {
+    if (Meteor.userId() == userId) {
         toastr.success(newAdditions + " CGSpace items imported", "Success!", {timeOut: 0, "extendedTimeOut": 0});
-        $("#fetch-items").prop('disabled', false);
+        $("#fetch-items").prop('disabled', false).removeClass("fa-spin");
     }
 });
 
-tweetEvent.addListener('progress', function(userId, newTweets, percentage) {
-    if(Meteor.userId() == userId) {
+tweetEvent.addListener('progress', function (userId, newTweets, percentage) {
+    if (Meteor.userId() == userId) {
         $("#items-tweeted").text(newTweets);
         $("#tweets-progress").css({
             width: percentage
@@ -31,92 +32,105 @@ tweetEvent.addListener('progress', function(userId, newTweets, percentage) {
     }
 });
 
-tweetEvent.addListener('complete', function(userId, newTweets) {
-    if(Meteor.userId() == userId) {
+tweetEvent.addListener('complete', function (userId, newTweets) {
+    if (Meteor.userId() == userId) {
         toastr.success(newTweets + " CGSpace items tweeted", "Success!", {timeOut: 0, "extendedTimeOut": 0});
         $("#tweet-items").prop('disabled', false);
     }
 });
 
-getItemHashtags = function(item){
-    var hashtags = item.communities.filter(function(community){
+getItemHashtags = function (item) {
+    var hashtags = item.communities.filter(function (community) {
         var parentCommunity = Communities.findOne({_id: community});
-        if(parentCommunity.hashtags && parentCommunity.hashtags.length > 0){
+        if (parentCommunity.hashtags && parentCommunity.hashtags.length > 0) {
             return true;
         }
-    }).map(function(community){
+    }).map(function (community) {
         var parentCommunity = Communities.findOne({_id: community});
         return parentCommunity.hashtags;
     });
-    return _.flatten(hashtags).length > 0 ? "#"+ _.flatten(hashtags).join(" #") : "N/A";
+    return _.flatten(hashtags).length > 0 ? "#" + _.flatten(hashtags).join(" #") : "N/A";
 };
 
-getItemMentions = function(item){
-    var mentions = item.communities.filter(function(community){
+getItemMentions = function (item) {
+    var mentions = item.communities.filter(function (community) {
         var parentCommunity = Communities.findOne({_id: community});
-        if(parentCommunity.mentions && parentCommunity.mentions.length > 0){
+        if (parentCommunity.mentions && parentCommunity.mentions.length > 0) {
             return true;
         }
-    }).map(function(community){
+    }).map(function (community) {
         var parentCommunity = Communities.findOne({_id: community});
         return parentCommunity.mentions;
     });
-    return _.flatten(mentions).length > 0 ? "@"+ _.flatten(mentions).join(" @") : "N/A";
+    return _.flatten(mentions).length > 0 ? "@" + _.flatten(mentions).join(" @") : "N/A";
 };
 
-getCommunitiesWithHashtags = function(searchHashtags){
+getCommunitiesWithHashtags = function (searchHashtags) {
     var communityIds = Communities.find({hashtags: {$in: searchHashtags}}, {name: 0}).fetch();
-    return _.map(communityIds, function(communityId){
+    return _.map(communityIds, function (communityId) {
         return communityId._id;
     });
 };
 
-getCommunitiesWithMentions = function(searchMentions){
+getCommunitiesWithMentions = function (searchMentions) {
     var communityIds = Communities.find({mentions: {$in: searchMentions}}, {name: 0}).fetch();
-    return _.map(communityIds, function(communityId){
+    return _.map(communityIds, function (communityId) {
         return communityId._id;
     });
 };
 
-getCopy = function(obj){
+getCopy = function (obj) {
     var newObj = {};
-    for(var k in obj) newObj[k]=obj[k];
+    for (var k in obj) newObj[k] = obj[k];
     return newObj;
 };
 
-findTokens = function(token, searchText){
+findTokens = function (token, searchText) {
     var regexp = token == "#" ? /\B\#\w\w+\b/g : /\B\@\w\w+\b/g;
-    return tokensFound = _.map(searchText.match(regexp), function(tokenFound){
+    return tokensFound = _.map(searchText.match(regexp), function (tokenFound) {
         return new RegExp(tokenFound.slice(1), "i");
     });
 };
 
 Template.home.helpers({
-    totalItems: function(){
+    totalItems: function () {
         return Counts.get("pendingItemsCount");
     },
-    totalTweetedItems: function(){
+    totalTweetedItems: function () {
         return Counts.get("tweetedItemsCount");
     },
     selectedItemsCount: function () {
         return selectedItemsCount.get();
     },
-    selectedSearchField: function(){
-        return searchField.get();
-    },
-    showDateSearchForm: function(){
+    showDateSearchForm: function () {
         return searchFieldType.get() == "date";
     },
-    skipItems: function(){
-        return specifySkipItems.get();
-    },
-    setEndpoint: function(){
+    setEndpoint: function () {
         return setAPIEndpoint.get();
+    },
+    setOffset: function () {
+        return setOffset.get();
+    },
+    filteredByHashtagsOrMentions: function () {
+        return filteredByHashtagsOrMentions.get();
     }
 });
 
 Template.home.events({
-    "change #all-items": function (e, t){
+    "click #advanced-search": function (e, t) {
+        if ($("#advanced-search i").hasClass("fa-chevron-circle-down")) {
+            $("#advanced-search i")
+                .removeClass("fa-chevron-circle-down")
+                .addClass("fa-chevron-circle-up");
+            $("#search-form").slideDown();
+        } else {
+            $("#advanced-search i")
+                .removeClass("fa-chevron-circle-up")
+                .addClass("fa-chevron-circle-down");
+            $("#search-form").slideUp();
+        }
+    },
+    "change #all-items": function (e, t) {
         if (e.target.checked) {
             t.$("table tbody tr>td input").prop("checked", true);
             Session.set("isNotificationSelected", true);
@@ -125,62 +139,71 @@ Template.home.events({
             Session.set("isNotificationSelected", false);
         }
         t.$("table tbody tr>td input").trigger("change");
-    },
-    "change input.item-selected": function(e, t){
+    }
+    ,
+    "change input.item-selected": function (e, t) {
         if (e.target.checked) {
             selectedItemsCount.set(selectedItemsCount.get() + 1);
-            if(t.$("table tbody tr>td input:checked").length == t.$("table tbody tr>td input").length){
+            if (t.$("table tbody tr>td input:checked").length == t.$("table tbody tr>td input").length) {
                 t.$("input#all-items").prop("checked", true);
             }
         } else {
             selectedItemsCount.set(selectedItemsCount.get() - 1);
             t.$("input#all-items").prop("checked", false);
         }
-    },
+    }
+    ,
     "click #fetch-items": function (e, t) {
-        t.$("#fetch-items").prop('disabled', true);
+        t.$("#fetch-items").prop('disabled', true).addClass("fa-spin");
 
         var endPoint = t.$("#endpoint").val();
 
         var minNumberOfItems = parseInt(t.$("#items-to-fetch").attr("min"), 10);
-        var newNumberOfItems = parseInt(t.$("#items-to-fetch").val(), 10);
+        var newNumberOfItems = parseInt(t.$("#items-to-fetch").val(), 10) || 1;
         var maxNumberOfItems = parseInt(t.$("#items-to-fetch").attr("max"), 10);
 
         var newNumberOfItemsToSkip = null;
 
-        if(specifySkipItems.get()){
+        if (setOffset.get()) {
 
             var minNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").attr("min"), 10);
             newNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").val(), 10);
             var maxNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").attr("max"), 10);
 
-            if(newNumberOfItemsToSkip < minNumberOfItemsToSkip){
+            if (newNumberOfItemsToSkip < minNumberOfItemsToSkip) {
                 newNumberOfItemsToSkip = minNumberOfItemsToSkip;
-            } else if(newNumberOfItemsToSkip > maxNumberOfItemsToSkip){
+            } else if (newNumberOfItemsToSkip > maxNumberOfItemsToSkip) {
                 newNumberOfItemsToSkip = maxNumberOfItemsToSkip;
             }
         }
 
-        if(newNumberOfItems < minNumberOfItems){
+        if (newNumberOfItems < minNumberOfItems) {
             newNumberOfItems = minNumberOfItems;
-        } else if(newNumberOfItems > maxNumberOfItems){
+        } else if (newNumberOfItems > maxNumberOfItems) {
             newNumberOfItems = maxNumberOfItems;
         }
 
-        Meteor.call("getCGSpaceItems", {limit: newNumberOfItems, offset: newNumberOfItemsToSkip}, endPoint, function(error){
-            if(error) {
+        Meteor.call("getCGSpaceItems", {
+            limit: newNumberOfItems,
+            offset: newNumberOfItemsToSkip
+        }, endPoint, function (error) {
+            if (error) {
                 toastr.error(error, "Error while getting items from CGSpace, please try again!");
             } else {
-                toastr.info("<strong id='items-imported'></strong> CGSpace items imported.<div class='progress'> <div id='items-progress' class='progress-bar progress-bar-success' style='width: 0%''></div></div>", "Import in progress!", {timeOut: 0, "extendedTimeOut": 0});
+                toastr.info("<strong id='items-imported'></strong> CGSpace items imported.<div class='progress'> <div id='items-progress' class='progress-bar progress-bar-success' style='width: 0%''></div></div>", "Import in progress!", {
+                    timeOut: 0,
+                    "extendedTimeOut": 0
+                });
             }
         });
     },
-    "keyup #items-to-fetch": function(e, t){
-        if(e.keyCode == 13){
+    "keyup #items-to-fetch": function (e, t) {
+        if (e.keyCode == 13) {
             t.$("#fetch-items").trigger("click");
         }
-    },
-    "click table thead th.sortable": function(e, t){
+    }
+    ,
+    "click table thead th.sortable": function (e, t) {
         t.$("table thead th.active").removeClass("active");
         t.$(e.target).addClass("active");
 
@@ -189,18 +212,20 @@ Template.home.events({
 
         // Move the sorter to the header
         t.$("#sorter").appendTo(t.$(e.target));
-    },
-    "click table thead th.sortable div#sorter": function(e, t){
+    }
+    ,
+    "click table thead th.sortable div#sorter": function (e, t) {
         e.stopPropagation();
-    },
-    "click table thead th.sortable i": function(e, t){
+    }
+    ,
+    "click table thead th.sortable i": function (e, t) {
         e.stopPropagation();
         var sortDirection = 1;
 
         t.$("i.active").removeClass("active");
         t.$(t.$(e.target)).addClass("active");
 
-        if(t.$(e.target).hasClass("fa-chevron-circle-up")){
+        if (t.$(e.target).hasClass("fa-chevron-circle-up")) {
             sortDirection = 1;
         } else {
             sortDirection = -1;
@@ -213,64 +238,70 @@ Template.home.events({
         Items.set({
             sort: sortOption
         });
-    },
-    "click #search-items": function(e, t){
-        var selectedField = searchField.get();
-        var searchTerm = t.$("#search-term").val().trim();
-        var searchTermFilter = getCopy(searchFilter.get());
-
-        if(!searchTerm) {
-            toastr.info("Please type in your search term");
-        } else {
-            searchTermFilter[selectedField] = {$regex : ".*"+ searchTerm +".*", $options: '-i'};
-            searchFilter.set(searchTermFilter);
-            Items.set({
-                filters: searchFilter.get()
-            });
-        }
-    },
-    "keyup #search-term": function(e, t){
-        var searchTermFilter = getCopy(searchFilter.get());
-        var selectedField = searchField.get();
-
-        if(e.keyCode == 13){
-            t.$("#search-items").trigger("click");
-        } else if(e.keyCode == 27){               // ESC key means reset
-
-            e.target.value = "";
-            delete searchTermFilter[selectedField];
-            searchFilter.set(searchTermFilter);
-            Items.set({
-                filters: searchFilter.get()
-            });
-        }
-    },
-    "keyup #search-hashtags-and-mentions": function(e, t){
+    }
+    ,
+    "keyup #search-hashtags-and-mentions": function (e, t) {
         var searchHashtagsFilter = getCopy(searchFilter.get());
 
-        if(e.keyCode == 13){
-            var searchHashtags =  findTokens("#", t.$("#search-hashtags-and-mentions").val().trim());
+        if (e.keyCode == 13) {
+            var searchHashtags = findTokens("#", t.$("#search-hashtags-and-mentions").val().trim());
             var searchMentions = findTokens("@", t.$("#search-hashtags-and-mentions").val().trim());
 
 
-            if(searchHashtags.length == 0 && searchMentions.length == 0){
+            if (searchHashtags.length == 0 && searchMentions.length == 0) {
                 toastr.info("Please specify a hashtag or a mention to search");
             } else {
-                searchHashtagsFilter.communities = {$in : _.union(getCommunitiesWithHashtags(searchHashtags), getCommunitiesWithMentions(searchMentions))};
+                searchHashtagsFilter.communities = {$in: _.union(getCommunitiesWithHashtags(searchHashtags), getCommunitiesWithMentions(searchMentions))};
                 searchFilter.set(searchHashtagsFilter);
                 Items.set({
                     filters: searchFilter.get()
                 });
+                filteredByHashtagsOrMentions.set(true);
             }
-        } else if(e.keyCode == 27){             // ESC key means reset
+        } else if (e.keyCode == 27) {             // ESC key means reset
             e.target.value = "";
             delete searchHashtagsFilter.communities;
             searchFilter.set(searchHashtagsFilter);
             Items.set({
                 filters: searchFilter.get()
             });
+            filteredByHashtagsOrMentions.set(false);
         }
-    },
+    }
+    ,
+    "click #search-hashtags-and-mentions-button": function (e, t) {
+        var searchHashtagsFilter = getCopy(searchFilter.get());
+
+        var searchHashtags = findTokens("#", t.$("#search-hashtags-and-mentions").val().trim());
+        var searchMentions = findTokens("@", t.$("#search-hashtags-and-mentions").val().trim());
+
+        if (searchHashtags.length == 0 && searchMentions.length == 0) {
+            toastr.info("Please specify a hashtag or a mention to search");
+        } else {
+            searchHashtagsFilter.communities = {$in: _.union(getCommunitiesWithHashtags(searchHashtags), getCommunitiesWithMentions(searchMentions))};
+            searchFilter.set(searchHashtagsFilter);
+            Items.set({
+                filters: searchFilter.get()
+            });
+            filteredByHashtagsOrMentions.set(true);
+        }
+    }
+    ,
+    "click #clear-hashtags-and-mentions-button": function (e, t) {
+        var searchHashtagsFilter = getCopy(searchFilter.get());
+
+        // Clear hashtags/mentions input box
+        $("#search-hashtags-and-mentions").val("");
+
+        delete searchHashtagsFilter.communities;
+        searchFilter.set(searchHashtagsFilter);
+        Items.set({
+            filters: searchFilter.get()
+        });
+
+        filteredByHashtagsOrMentions.set(false);
+    }
+    ,
     "click #tweet-items": function (e, t) {
         var selectedItems = _.map(t.findAll("table tr td input:checked"), function (checkbox) {
             var selectedItem = {
@@ -278,22 +309,25 @@ Template.home.events({
                 title: checkbox.dataset.itemTitle,
                 handle: checkbox.dataset.itemHandle
             };
-            if(checkbox.dataset.itemHashtags != "N/A"){
+            if (checkbox.dataset.itemHashtags != "N/A") {
                 selectedItem.hashtags = checkbox.dataset.itemHashtags;
             }
-            if(checkbox.dataset.itemMentions != "N/A"){
+            if (checkbox.dataset.itemMentions != "N/A") {
                 selectedItem.mentions = checkbox.dataset.itemMentions;
             }
             return selectedItem;
         });
 
-        if(selectedItems.length > 0){
+        if (selectedItems.length > 0) {
             t.$("#tweet-items").prop('disabled', true);
-            Meteor.call("tweetItems", selectedItems, function(error){
-                if(error) {
+            Meteor.call("tweetItems", selectedItems, function (error) {
+                if (error) {
                     toastr.error(error, "Error while tweeting items, please try again!");
                 } else {
-                    toastr.info("<strong id='items-tweeted'></strong> Items tweeted.<div class='progress'> <div id='tweets-progress' class='progress-bar progress-bar-success' style='width: 0%''></div></div>", "Tweets in progress!", {timeOut: 0, "extendedTimeOut": 0});
+                    toastr.info("<strong id='items-tweeted'></strong> Items tweeted.<div class='progress'> <div id='tweets-progress' class='progress-bar progress-bar-success' style='width: 0%''></div></div>", "Tweets in progress!", {
+                        timeOut: 0,
+                        "extendedTimeOut": 0
+                    });
                 }
             });
             // Clear selected items
@@ -303,77 +337,120 @@ Template.home.events({
             toastr.info("Please select items to Tweet");
         }
     }
+})
+;
+
+Template.home.onRendered(function () {
+    $.material.init();
 });
 
 Template.item.helpers({
-    issuedOn: function(){
+    issuedOn: function () {
         return moment(this.dateIssued).format('YYYY-MM-DD');
     },
-    importedOn: function(){
+    importedOn: function () {
         return moment(this.importedDate).format('YYYY-MM-DD');
     },
-    tweetedItem: function(){
+    tweetedItem: function () {
         return this.tweeted ? "tweeted" : "";
     },
-    itemWithDOI: function(){
+    itemWithDOI: function () {
         return this.doi ? "with-doi" : "";
     },
-    hashtags: function(){
+    hashtags: function () {
         return getItemHashtags(this);
     },
-    mentions: function(){
+    mentions: function () {
         return getItemMentions(this);
     }
 });
 
 Template.itemSelect.helpers({
-    alreadyTweeted: function(){
+    alreadyTweeted: function () {
         return this.tweeted;
     },
-    hashtags: function(){
+    hashtags: function () {
         return getItemHashtags(this);
     },
-    mentions: function(){
+    mentions: function () {
         return getItemMentions(this);
     }
 });
 
 Template.itemSelect.events({
-    "click i": function(e, t){
+    "click i": function (e, t) {
         tweetInfo.set(this.tweets);
     }
 });
 
-Template.itemSelect.onRendered(function(){
+Template.itemSelect.onRendered(function () {
     $.material.checkbox();
     $("input#all-items").prop("checked", false);
     selectedItemsCount.set($("table tbody tr>td input:checked").length);
 });
 
+Template.searchByForm.events({
+    "change select#select-search-field": function(e,t){
+        var selectedSearchBy = e.target.value;
+        var selectedFieldType = $("select#select-search-field option:selected").data("sort-field-type");
+
+        $("table thead th.active").removeClass("active");
+        $("[data-sort-field='"+ selectedSearchBy +"']").addClass("active");
+
+        // Move the sorter to the header
+        $("#sorter").appendTo("[data-sort-field='"+ selectedSearchBy +"']");
+
+        searchField.set(selectedSearchBy);
+        searchFieldType.set(selectedFieldType);
+    }
+});
+
+Template.sortByForm.events({
+   "change input:radio[name=sort]": function(e, t){
+        var sortDirection = parseInt(e.target.value, 10);
+
+        $("#sorter i.active").removeClass("active");
+      
+        if (sortDirection == 1){
+            $("#sorter i.fa-chevron-circle-up").addClass("active");
+        } else {
+            $("#sorter i.fa-chevron-circle-down").addClass("active");
+        }
+
+        sortKey = searchField.get();
+        sortOption = {};
+        sortOption[sortKey] = sortDirection;
+
+        Items.set({
+            sort: sortOption
+        });
+   }
+});
+
 Template.dateSearchForm.events({
-    "click #search-items-by-date": function(e, t){
+    "click #search-items-by-date": function (e, t) {
         var selectedField = searchField.get();
         var searchDateFilter = getCopy(searchFilter.get());
 
         var afterDateString = t.$("#search-after-date").val().trim();
         var beforeDateString = t.$("#search-before-date").val().trim();
 
-        if(afterDateString == "" && beforeDateString == ""){ // no dates picked
+        if (afterDateString == "" && beforeDateString == "") { // no dates picked
             toastr.info("Please pick a date!");
         } else {
             var afterDate, beforeDate = null;
 
 
-            if(afterDateString != ""){
-                afterDate = moment(afterDateString, "MM/DD/YYYY h:mm A");
+            if (afterDateString != "") {
+                afterDate = moment(afterDateString, "YYYY-MM-DD");
             }
 
-            if(beforeDateString != ""){
-                beforeDate = moment(beforeDateString, "MM/DD/YYYY h:mm A");
+            if (beforeDateString != "") {
+                beforeDate = moment(beforeDateString, "YYYY-MM-DD");
             }
 
-            if(afterDate && beforeDate){ // search in specified range
-                if(beforeDate > afterDate){
+            if (afterDate && beforeDate) { // search in specified range
+                if (beforeDate > afterDate) {
                     searchDateFilter[selectedField] = {
                         $gte: afterDate.toDate(),
                         $lte: beforeDate.toDate()
@@ -381,25 +458,25 @@ Template.dateSearchForm.events({
                 } else {
                     toastr.info("Please make sure your selected date range is correct!");
                 }
-            } else if(afterDate) {     // search after specified date
+            } else if (afterDate) {     // search after specified date
                 searchDateFilter[selectedField] = {
                     $gte: afterDate.toDate()
                 }
-            } else if(beforeDate) {   // search before specified date
+            } else if (beforeDate) {   // search before specified date
                 searchDateFilter[selectedField] = {
                     $lte: beforeDate.toDate()
                 }
             }
         }
 
-        if(searchDateFilter[selectedField]){ // make sure filter is specified
+        if (searchDateFilter[selectedField]) { // make sure filter is specified
             searchFilter.set(searchDateFilter);
             Items.set({
                 filters: searchFilter.get()
             });
         }
     },
-    "click #clear-search-items-by-date": function(e, t){
+    "click #clear-search-items-by-date": function (e, t) {
         var selectedField = searchField.get();
         var searchDateFilter = getCopy(searchFilter.get());
 
@@ -413,34 +490,112 @@ Template.dateSearchForm.events({
 });
 
 Template.dateSearchForm.helpers({
-    selectedSearchField: function(){
-        return searchField.get();
+    selectedSearchField: function () {
+        return searchField.get().match(/[A-Z]*[^A-Z]+/g).join(" ");
     }
 });
 
-Template.dateSearchForm.onRendered(function(){
-    this.$('.datetimepicker').datetimepicker();
+Template.dateSearchForm.onRendered(function () {
+    $.material.init();
 });
 
-Template.skipSpecifyOption.events({
-    "change #skip-items": function(e, t){
-        if(e.target.checked){
-            specifySkipItems.set(true);
+Template.textSearchForm.helpers({
+    selectedSearchField: function () {
+        return searchField.get().match(/[A-Z]*[^A-Z]+/g).join(" ");
+    }
+});
+
+Template.textSearchForm.events({
+    "keyup #search-term": function (e, t) {
+        var searchTermFilter = getCopy(searchFilter.get());
+        var selectedField = searchField.get();
+
+        if (e.keyCode == 13) {
+            t.$("#search-items").trigger("click");
+        } else if (e.keyCode == 27) {               // ESC key means reset
+
+            e.target.value = "";
+            delete searchTermFilter[selectedField];
+            searchFilter.set(searchTermFilter);
+            Items.set({
+                filters: searchFilter.get()
+            });
+        }
+    },
+    "click #search-items": function (e, t) {
+        var selectedField = searchField.get();
+        var searchTerm = t.$("#search-term").val().trim();
+        var searchTermFilter = getCopy(searchFilter.get());
+
+        if (!searchTerm) {
+            toastr.info("Please type in your search term");
         } else {
-            specifySkipItems.set(false);
+            searchTermFilter[selectedField] = {$regex: ".*" + searchTerm + ".*", $options: '-i'};
+            searchFilter.set(searchTermFilter);
+            Items.set({
+                filters: searchFilter.get()
+            });
+        }
+    },
+    "click #clear-search-items": function (e, t) {
+        var searchTermFilter = getCopy(searchFilter.get());
+        var selectedField = searchField.get();
+
+        $("#search-term").val("");
+        delete searchTermFilter[selectedField];
+        searchFilter.set(searchTermFilter);
+        Items.set({
+            filters: searchFilter.get()
+        });
+    }
+});
+
+Template.textSearchForm.onRendered(function () {
+    $.material.init();
+});
+
+Template.setAPIEndpointOption.events({
+    "change #set-endpoint": function (e, t) {
+        if (e.target.checked) {
+            setAPIEndpoint.set(true);
+        } else {
+            setAPIEndpoint.set(false);
         }
     }
 });
 
-Template.skipSpecifyOption.onRendered(function(){
+Template.setAPIEndpointOption.onRendered(function () {
     $.material.checkbox();
 });
 
+Template.setAPIEndpointForm.onRendered(function () {
+    $.material.init();
+});
+
+Template.setOffsetOption.events({
+    "change #set-offset": function (e, t) {
+        if (e.target.checked) {
+            setOffset.set(true);
+        } else {
+            setOffset.set(false);
+        }
+    }
+});
+
+Template.setOffsetOption.onRendered(function () {
+    $.material.checkbox();
+});
+
+Template.setOffsetForm.onRendered(function () {
+    $.material.init();
+});
+
+
 Template.showItemsWithDOIOnlyOption.events({
-    "change #doi-items": function(e, t){
+    "change #doi-items": function (e, t) {
         var searchDOIFilter = getCopy(searchFilter.get());
 
-        if(e.target.checked){
+        if (e.target.checked) {
             searchDOIFilter.doi = {$exists: 1};
             searchFilter.set(searchDOIFilter);
             Items.set({
@@ -456,56 +611,43 @@ Template.showItemsWithDOIOnlyOption.events({
     }
 });
 
-Template.showItemsWithDOIOnlyOption.onRendered(function(){
+Template.showItemsWithDOIOnlyOption.onRendered(function () {
     $.material.checkbox();
 });
 
-Template.setAPIEndpointOption.events({
-    "change #set-endpoint": function(e, t){
-        if(e.target.checked){
-            setAPIEndpoint.set(true);
-        } else {
-            setAPIEndpoint.set(false);
-        }
-    }
-});
-
-Template.setAPIEndpointOption.onRendered(function(){
-    $.material.checkbox();
-});
 
 Template.tweetInfoModal.helpers({
-    tweets: function(){
+    tweets: function () {
         return tweetInfo.get();
     },
-    tweetedDate: function(){
+    tweetedDate: function () {
         return moment(this.tweetedOn).format('MMMM Do YYYY h:mm A');
     }
 });
 
 Template.hashtagsAndMentions.helpers({
-    hashtagsArray: function(){
+    hashtagsArray: function () {
         return Communities.find({hashtags: {$exists: true}}, {hashtags: 1});
     },
-    hashtagsString: function(){
-        return "#"+ this.hashtags.join(" #");
+    hashtagsString: function () {
+        return "#" + this.hashtags.join(" #");
     },
-    hashtagsURL: function(){
-        return "https://twitter.com/search?q=%23"+ this.hashtags.join("%20%23");
+    hashtagsURL: function () {
+        return "https://twitter.com/search?q=%23" + this.hashtags.join("%20%23");
     },
-    shouldScrollHashtagsList: function(){
+    shouldScrollHashtagsList: function () {
         return Counts.get("communitiesWithHashtags") > 7;
     },
-    mentionsArray: function(){
+    mentionsArray: function () {
         return Communities.find({mentions: {$exists: true}}, {mentions: 1});
     },
-    mentionsString: function(){
-        return "@"+ this.mentions.join(" @");
+    mentionsString: function () {
+        return "@" + this.mentions.join(" @");
     },
-    mentionsURL: function(){
-        return "https://twitter.com/search?q=%40"+ this.mentions.join("%20%40");
+    mentionsURL: function () {
+        return "https://twitter.com/search?q=%40" + this.mentions.join("%20%40");
     },
-    shouldScrollMentionsList: function(){
+    shouldScrollMentionsList: function () {
         return Counts.get("communitiesWithMentions") > 7;
     }
 });

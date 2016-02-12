@@ -116,14 +116,17 @@ adjustPager = function(){
       paginationMargin: 3
     });
   }
-}
+};
 
 Template.home.helpers({
   totalItems: function () {
-    return Counts.get("pendingItemsCount");
+    return Counts.get("totalItemsCount");
   },
-  totalTweetedItems: function () {
+  tweetedItems: function () {
     return Counts.get("tweetedItemsCount");
+  },
+  pendingItems: function () {
+    return Counts.get("pendingItemsCount");
   },
   selectedItemsCount: function () {
     return selectedItemsCount.get();
@@ -190,7 +193,7 @@ Template.home.events({
     if (setOffset.get()) {
 
       var minNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").attr("min"), 10);
-      newNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").val(), 10);
+      newNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").val(), 10) || Counts.get("totalItemsCount");
       var maxNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").attr("max"), 10);
 
       if (newNumberOfItemsToSkip < minNumberOfItemsToSkip) {

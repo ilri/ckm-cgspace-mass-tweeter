@@ -66,8 +66,9 @@
           <div class="col-md-3">
             <div class="stats hidden-sm hidden-xs">
               <h4>Quick Stats</h4>
-              <p>Total Entries: {{totalItems}}</p>
-              <p>Total Tweets: {{totalTweetedItems}}</p>
+              <p>Total Items: {{totalItems}}</p>
+              <p>Tweeted Items: {{tweetedItems}}</p>
+                <p>Pending Items: {{pendingItems}}</p>
             </div>
             <div class="form-group">
               <p>Selected Entries: {{ selectedItemsCount }}</p>
@@ -266,7 +267,7 @@
     <template name="setOffsetForm">
       <div class="form-group label-floating">
         <label class="control-label" for="offset">Items to Skip</label>
-        <input type="number" id="offset" class="form-control" min="0" max="49950"/>
+        <input type="number" id="items-to-skip" class="form-control" min="0" max="49950"/>
         <p class="help-block small">(0 - ~49,950).</p>
       </div>
     </template>

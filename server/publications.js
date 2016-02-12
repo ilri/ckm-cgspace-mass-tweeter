@@ -3,7 +3,7 @@ Meteor.publish("users", function(){
 });
 
 Meteor.publish("allItems", function(){
-  Counts.publish(this, 'itemsCount', Items.Collection.find());
+  Counts.publish(this, 'totalItemsCount', Items.Collection.find());
   Counts.publish(this, 'pendingItemsCount', Items.Collection.find({tweeted: false}));
   Counts.publish(this, 'tweetedItemsCount', Items.Collection.find({tweeted: true}));
 });

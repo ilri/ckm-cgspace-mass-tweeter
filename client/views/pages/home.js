@@ -142,6 +142,9 @@ Template.home.helpers({
   },
   filteredByHashtagsOrMentions: function () {
     return filteredByHashtagsOrMentions.get();
+  },
+  selectedItemsToTweet: function(){
+    return pluralize("tweet", parseInt(selectedItemsCount.get(), 10));
   }
 });
 
@@ -372,6 +375,9 @@ Template.home.onRendered(function () {
   $(window).resize(function(){
     adjustPager();
   });
+
+  $("#tweet-items").sticky({topSpacing:60});
+
 });
 
 Template.item.helpers({

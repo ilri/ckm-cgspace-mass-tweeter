@@ -6,6 +6,7 @@ alethes:pages@1.8.4
 autoupdate@1.2.4
 babel-compiler@5.8.24_1
 babel-runtime@0.1.4
+bambattajb:sticky@1.1.1
 base64@1.0.4
 binary-heap@1.0.4
 blaze@2.1.3
@@ -47,6 +48,7 @@ iron:location@1.0.11
 iron:middleware-stack@1.0.11
 iron:router@1.0.12
 iron:url@1.0.11
+jamiter:pluralize@1.0.2
 jquery@1.11.4
 lablancas:twitter@0.0.1
 launch-screen@1.0.4

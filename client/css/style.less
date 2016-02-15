@@ -8,8 +8,8 @@ label.option {
 
 nav.navbar.navbar-default.navbar-cg {
   background-color: #4caf50;
-  a.navbar-brand{
-    img{
+  a.navbar-brand {
+    img {
       display: inline-block;
     }
   }
@@ -23,9 +23,6 @@ div.disabled {
 
 div.panel {
   div.panel-body {
-    &.items-list {
-      overflow: scroll;
-    }
     div.form-group {
       label.option {
         font-weight: 400;
@@ -37,7 +34,7 @@ div.panel {
           width: 19px;
         }
       }
-      a#tweet-items{
+      a#tweet-items {
         z-index: 100;
       }
     }
@@ -99,7 +96,7 @@ div.panel {
               cursor: pointer;
             }
             .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check,
-            .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check:before{
+            .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check:before {
               color: #fff !important;
               border-color: #fff !important;
             }
@@ -111,30 +108,32 @@ div.panel {
 }
 
 .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check,
-.checkbox-primary input[type=checkbox]:checked + .checkbox-material .check:before{
+.checkbox-primary input[type=checkbox]:checked + .checkbox-material .check:before {
   color: #4caf50;
   border-color: #4caf50;
 }
 
-h4#advanced-search{
+h4#advanced-search {
   cursor: pointer;
-  &:hover{
+  &:hover {
     color: #4caf50;
-    i{
+    i {
       color: #4caf50;
     }
   }
-  i{
+  i {
     font-size: 1.3em;
   }
 }
-div#search-form{
+
+div#search-form {
   display: none;
 }
 
 @media screen and (max-width: 400px) {
   div.panel.items div.panel-body {
     padding: 20px 0;
+    overflow: scroll;
   }
 }
 
@@ -256,7 +255,7 @@ tr.with-doi {
       color: #000 !important;
     }
     .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check,
-    .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check:before{
+    .checkbox-primary input[type=checkbox]:checked + .checkbox-material .check:before {
       color: #fff !important;
       border-color: #fff !important;
     }

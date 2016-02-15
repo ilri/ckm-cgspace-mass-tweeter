@@ -151,11 +151,11 @@
         <strong>Mentions:</strong> {{mentions}}
       </div>
       <div class="handle visible-xs">
-        <strong>Handle:</strong> <a href="{{handle}}" target="_blank">{{handle}}</a>
+        <strong>Handle:</strong> <a href="#" onclick="window.open('{{handle}}', '_system');">{{handle}}</a>
       </div>
       {{#if doi}}
       <div class="doi">
-        <strong>DOI:</strong> <a href="{{doi}}" target="_blank">{{doi}}</a>
+        <strong>DOI:</strong> <a href="#" onclick="window.open('{{doi}}', '_system');">{{doi}}</a>
       </div>
       {{/if}}
       <div class="last-modified visible-xs visible-sm">
@@ -166,7 +166,7 @@
       </div>
     </td>
     <td class="hidden-xs">
-      <a href="{{handle}}" target="_blank">{{handle}}</a>
+        <a href="#" onclick="window.open('{{handle}}', '_system');">{{handle}}</a>
     </td>
     <td class="hidden-xs hidden-sm">{{issuedOn}}</td>
     <td class="hidden-xs hidden-sm">{{importedOn}}</td>

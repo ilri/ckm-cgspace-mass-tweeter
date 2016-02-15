@@ -43,4 +43,8 @@ App.launchScreens({
 });
 
 App.setPreference('StatusBarOverlaysWebView', 'false');
-App.setPreference('StatusBarBackgroundColor', '#4caf50');
+App.setPreference('StatusBarBackgroundColor', '#427730');
+
+// Allow access to external links to handles and DOIs
+App.accessRule('http://hdl.handle.net/*');
+App.accessRule('http://dx.doi.org/*');

@@ -2,8 +2,7 @@ selectedItemsCount = new ReactiveVar(0);
 searchFilter = new ReactiveVar({});
 searchField = new ReactiveVar("dateIssued");
 searchFieldType = new ReactiveVar("date");
-setOffset = new ReactiveVar(false);
-setAPIEndpoint = new ReactiveVar(false);
+
 tweetInfo = new ReactiveVar();
 filteredByHashtagsOrMentions = new ReactiveVar(false);
 
@@ -17,21 +16,7 @@ $.fn.checkItem = function(check) {
   });
 };
 
-fetchEvent.addListener('progress', function (userId, newAdditions, percentage) {
-  if (Meteor.userId() == userId) {
-    $("#items-imported").text(newAdditions);
-    $("#items-progress").css({
-      width: percentage
-    });
-  }
-});
 
-fetchEvent.addListener('complete', function (userId, newAdditions) {
-  if (Meteor.userId() == userId) {
-    toastr.success(newAdditions + " CGSpace items imported", "Success!", {timeOut: 0, "extendedTimeOut": 0});
-    $("#fetch-items").prop('disabled', false).removeClass("fa-spin");
-  }
-});
 
 tweetEvent.addListener('progress', function (userId, newTweets, percentage) {
   if (Meteor.userId() == userId) {
@@ -134,12 +119,6 @@ Template.home.helpers({
   showDateSearchForm: function () {
     return searchFieldType.get() == "date";
   },
-  setEndpoint: function () {
-    return setAPIEndpoint.get();
-  },
-  setOffset: function () {
-    return setOffset.get();
-  },
   filteredByHashtagsOrMentions: function () {
     return filteredByHashtagsOrMentions.get();
   },
@@ -181,50 +160,6 @@ Template.home.events({
       t.$("i#all-items").checkItem(false);
     }
     selectedItemsCount.set(t.$("table tbody tr>td i.fa-check-square-o").length);
-  },
-  "click #fetch-items": function (e, t) {
-    t.$("#fetch-items").prop('disabled', true).addClass("fa-spin");
-
-    var endPoint = t.$("#endpoint").val();
-
-    var minNumberOfItems = parseInt(t.$("#items-to-fetch").attr("min"), 10);
-    var newNumberOfItems = parseInt(t.$("#items-to-fetch").val(), 10) || 1;
-    var maxNumberOfItems = parseInt(t.$("#items-to-fetch").attr("max"), 10);
-
-    var newNumberOfItemsToSkip = null;
-
-    if (setOffset.get()) {
-
-      var minNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").attr("min"), 10);
-      newNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").val(), 10) || Counts.get("totalItemsCount");
-      var maxNumberOfItemsToSkip = parseInt(t.$("#items-to-skip").attr("max"), 10);
-
-      if (newNumberOfItemsToSkip < minNumberOfItemsToSkip) {
-        newNumberOfItemsToSkip = minNumberOfItemsToSkip;
-      } else if (newNumberOfItemsToSkip > maxNumberOfItemsToSkip) {
-        newNumberOfItemsToSkip = maxNumberOfItemsToSkip;
-      }
-    }
-
-    if (newNumberOfItems < minNumberOfItems) {
-      newNumberOfItems = minNumberOfItems;
-    } else if (newNumberOfItems > maxNumberOfItems) {
-      newNumberOfItems = maxNumberOfItems;
-    }
-
-    Meteor.call("getCGSpaceItems", {
-      limit: newNumberOfItems,
-      offset: newNumberOfItemsToSkip
-    }, endPoint, function (error) {
-      if (error) {
-        toastr.error(error, "Error while getting items from CGSpace, please try again!");
-      } else {
-        toastr.info("<strong id='items-imported'></strong> CGSpace items imported.<div class='progress'> <div id='items-progress' class='progress-bar progress-bar-success' style='width: 0%''></div></div>", "Import in progress!", {
-          timeOut: 0,
-          "extendedTimeOut": 0
-        });
-      }
-    });
   },
   "keyup #items-to-fetch": function (e, t) {
     if (e.keyCode == 13) {
@@ -589,37 +524,7 @@ Template.textSearchForm.onRendered(function () {
   $.material.init();
 });
 
-Template.setAPIEndpointOption.events({
-  "click #set-endpoint": function(e, t){
-    var checkIcon = t.$(e.target).hasClass("fa") ? t.$(e.target) : t.$(e.target).children("i");
 
-    if(checkIcon.hasClass("fa-square-o")){
-      checkIcon.checkItem(true);
-      setAPIEndpoint.set(true);
-    } else {
-      checkIcon.checkItem(false);
-      setAPIEndpoint.set(false);
-    }
-  }
-});
-
-Template.setAPIEndpointForm.onRendered(function () {
-  $.material.init();
-});
-
-Template.setOffsetOption.events({
-  "click #skip-items": function(e, t){
-    var checkIcon = t.$(e.target).hasClass("fa") ? t.$(e.target) : t.$(e.target).children("i");
-
-    if (checkIcon.hasClass("fa-square-o")) {
-      checkIcon.checkItem(true);
-      setOffset.set(true);
-    } else {
-      checkIcon.checkItem(false);
-      setOffset.set(false);
-    }
-  },
-});
 
 Template.setOffsetForm.onRendered(function () {
   $.material.init();

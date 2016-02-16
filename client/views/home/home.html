@@ -1,0 +1,304 @@
+<template name="home">
+    {{> navbar }}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                {{> showItemsWithDOIOnlyOption }}
+                                <div class="form-group label-floating">
+                                    <div class="input-group">
+                                        <label class="control-label" for="search-hashtags-and-mentions">Search by # or
+                                            @</label>
+                                        <input id="search-hashtags-and-mentions" class="form-control"/>
+                                        <p class="small">
+                                            e.g. <em>#ILRI, @CTAflash</em>
+                                            <i id="hashtags-and-mentions-button" class="fa fa-info-circle"
+                                               data-toggle="modal" data-target="#hashtags-and-mentions-modal"></i>
+                                        </p>
+                                        <span class="input-group-btn">
+                                            {{#unless filteredByHashtagsOrMentions }}
+                                                <button id="search-hashtags-and-mentions-button" type="button"
+                                                        class="btn btn-fab btn-fab-mini btn-success">
+                                                    <i class="fa fa-filter"></i>
+                                                </button>
+                                            {{else}}
+                                                <button id="clear-hashtags-and-mentions-button" type="button"
+                                                        class="btn btn-fab btn-fab-mini">
+                                                    <i class="fa fa-times"></i>
+                                                </button>
+                                            {{/unless}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats hidden-sm hidden-xs">
+                                <h4>Quick Stats</h4>
+                                <p>Total Items: {{totalItems}}</p>
+                                <p>Tweeted Items: {{tweetedItems}}</p>
+                                <p>Pending Items: {{pendingItems}}</p>
+                            </div>
+                            <div class="form-group">
+                                <a id="tweet-items" href="#"
+                                   class="btn btn-default btn-lg btn-block btn-success btn-raised"><i
+                                        class="fa fa-twitter"></i> {{ selectedItemsCount }} {{ selectedItemsToTweet }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <h4 id="advanced-search">Advanced Search <i class="fa fa-chevron-circle-down"></i></h4>
+                    <div id="search-form" class="row">
+                        <div class="col-sm-6">
+                            {{> searchByForm }}
+                            {{> sortByForm }}
+                        </div>
+                        <div class="col-sm-6">
+                            {{#if showDateSearchForm }}
+                                {{> dateSearchForm }}
+                            {{else}}
+                                {{> textSearchForm }}
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{> items}}
+    {{> tweetInfoModal}}
+    {{> hashtagsAndMentions}}
+    {{> footer}}
+</template>
+
+<template name="items">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default items">
+                <div class="panel-header">
+                    {{> pagesNav}}
+                </div>
+                <div class="panel-body items-list">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th class="col-md-1 col-sm-1">
+                                <i id="all-items" class="fa fa-square-o" data-item-title="{{title}}"
+                                   data-item-handle="{{handle}}" data-item-hashtags="{{hashtags}}"
+                                   data-item-mentions="{{mentions}}"></i>
+                            </th>
+                            <th class="col-md-4 col-sm-4 sortable hidden-xs" data-sort-field="title"
+                                data-sort-field-type="text">Title
+                            </th>
+                            <th class="col-md-3 col-sm-3 sortable hidden-xs" data-sort-field="handle"
+                                data-sort-field-type="text">Handle
+                            </th>
+                            <th class="col-md-2 col-sm-2 sortable active hidden-xs hidden-sm"
+                                data-sort-field="dateIssued" data-sort-field-type="date">
+                                Date Issued
+                                <div id="sorter" class="pull-right">
+                                    <i class="fa fa-chevron-circle-up"></i><i
+                                        class="fa fa-chevron-circle-down active"></i>
+                                </div>
+                            </th>
+                            <th class="col-md-2 col-sm-2 sortable hidden-xs hidden-sm" data-sort-field="importedDate"
+                                data-sort-field-type="date">
+                                Imported On
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{> pages}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template name="item">
+    <tr class="{{tweetedItem}} {{itemWithDOI}}">
+        <td>{{> itemSelect}}</td>
+        <td>
+            {{title}}
+            <div class="hashtag">
+                <strong>Hashtags:</strong> {{hashtags}}
+            </div>
+            <div class="hashtag">
+                <strong>Mentions:</strong> {{mentions}}
+            </div>
+            <div class="handle visible-xs">
+                <strong>Handle:</strong> <a href="#" onclick="window.open('{{handle}}', '_system');">{{handle}}</a>
+            </div>
+            {{#if doi}}
+                <div class="doi">
+                    <strong>DOI:</strong> <a href="#" onclick="window.open('{{doi}}', '_system');">{{doi}}</a>
+                </div>
+            {{/if}}
+            <div class="last-modified visible-xs visible-sm">
+                <strong>Date Issued:</strong> {{issuedOn}}
+            </div>
+            <div class="imported-on visible-xs visible-sm">
+                <strong>Imported On:</strong> {{importedOn}}
+            </div>
+        </td>
+        <td class="hidden-xs">
+            <a href="#" onclick="window.open('{{handle}}', '_system');">{{handle}}</a>
+        </td>
+        <td class="hidden-xs hidden-sm">{{issuedOn}}</td>
+        <td class="hidden-xs hidden-sm">{{importedOn}}</td>
+    </tr>
+</template>
+
+<template name="itemSelect">
+    <i id="{{_id}}" class="fa fa-square-o item-selected" data-item-title="{{title}}" data-item-handle="{{handle}}"
+       data-item-hashtags="{{hashtags}}" data-item-mentions="{{mentions}}"></i>
+    {{#if alreadyTweeted}}
+        <i class="fa fa-info-circle" data-toggle="modal" data-target="#tweetInfoModal"></i>
+    {{/if}}
+</template>
+
+<template name="searchByForm">
+    <div class="form-group">
+        <label class="control-label" for="select-search-field">Search By</label>
+        <select id="select-search-field" class="form-control">
+            <option value="title" data-sort-field-type="text">Title</option>
+            <option value="handle" data-sort-field-type="text">Handle</option>
+            <option value="dateIssued" data-sort-field-type="date" selected>Date Issued</option>
+            <option value="importedDate" data-sort-field-type="date">Imported Date</option>
+        </select>
+    </div>
+</template>
+
+<template name="sortByForm">
+    <div class="form-group">
+        <label class="control-label" for="select-search-field">Sort</label>
+        <div class="radio radio-primary">
+            <label>
+                <input type="radio" name="sort" id="sortAscending" value="1">
+                Ascending
+            </label>
+        </div>
+        <div class="radio radio-primary">
+            <label>
+                <input type="radio" name="sort" id="sortAscending" value="-1" checked="checked">
+                Decending
+            </label>
+        </div>
+    </div>
+</template>
+
+<template name="dateSearchForm">
+    <div class="form-group">
+        <label class="control-label" for="search-after-date"><strong
+                class="selected-search-field">{{selectedSearchField}}</strong> After</label>
+        <input id="search-after-date" class="form-control picker" type="date"/>
+    </div>
+    <div class="form-group">
+        <label class="control-label" for="search-before-date"><strong
+                class="selected-search-field">{{selectedSearchField}}</strong> Before</label>
+        <input id="search-before-date" class="form-control picker" type="date"/>
+    </div>
+    <div class="btn-group btn-group-justified btn-group-raised">
+        <a id="search-items-by-date" href="#" class="btn btn-success"><i class="fa fa-search"></i> Search</a>
+        <a id="clear-search-items-by-date" href="#" class="btn "><i class="fa fa-times"></i> Clear</a>
+    </div>
+</template>
+
+<template name="textSearchForm">
+    <div class="form-group label-floating">
+        <label class="control-label" for="search-term">
+            Search items by <strong class="selected-search-field">{{selectedSearchField}}</strong>
+        </label>
+        <input type="text" id="search-term" class="form-control"/>
+        <div class="btn-group btn-group-justified btn-group-raised">
+            <a id="search-items" href="#" class="btn btn-success">
+                <i class="fa fa-search"></i> Search
+            </a>
+            <a id="clear-search-items" href="#" class="btn ">
+                <i class="fa fa-times"></i> Clear
+            </a>
+        </div>
+    </div>
+</template>
+
+<template name="showItemsWithDOIOnlyOption">
+    <div class="form-group">
+        <label id="doi-items" class="option"><i class="fa fa-square-o"></i> Show Items with DOI only</label>
+    </div>
+</template>
+
+<template name="tweetInfoModal">
+    <div class="modal fade" id="tweetInfoModal" tabindex="-1" role="dialog" aria-labelledby="tweetInfoModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Who's Tweeted this Item?</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="tweets-list">
+                        {{#each tweets}}
+                            <p><a href="https://twitter.com/{{tweeter}}" target="_blank">@{{tweeter}}</a>
+                                - {{tweetedDate}}</p>
+                        {{/each}}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template name="hashTags">
+    {{hashtag}}
+</template>
+
+<template name="hashtagsAndMentions">
+    <div class="modal fade" id="hashtags-and-mentions-modal" tabindex="-1" role="dialog"
+         aria-labelledby="hashtagsAndMentions">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Available Hashtags and Mentions</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-6 reference-list">
+                            <div>
+                                {{#each hashtagsArray}}
+                                    <p><a href="{{hashtagsURL}}" target="_blank">{{hashtagsString}}</a></p>
+                                {{/each}}
+                            </div>
+                            {{#if shouldScrollHashtagsList}}
+                                <p class="small">Scroll down to see more</p>
+                            {{/if}}
+                        </div>
+                        <div class="col-xs-6 reference-list">
+                            <div>
+                                {{#each mentionsArray}}
+                                    <p><a href="{{mentionsURL}}" target="_blank">{{mentionsString}}</a></p>
+                                {{/each}}
+                            </div>
+                            {{#if shouldScrollMentionsList}}
+                                <p class="small">Scroll down to see more</p>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

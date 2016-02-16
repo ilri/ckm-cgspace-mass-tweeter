@@ -276,7 +276,7 @@
                         <div class="col-xs-6 reference-list">
                             <div>
                                 {{#each hashtagsArray}}
-                                    <p><a href="{{hashtagsURL}}" target="_blank">{{hashtagsString}}</a></p>
+                                    <p><a href="#" onclick="window.open('{{hashtagsURL}}', '_system');">{{hashtagsString}}</a></p>
                                 {{/each}}
                             </div>
                             {{#if shouldScrollHashtagsList}}
@@ -286,7 +286,7 @@
                         <div class="col-xs-6 reference-list">
                             <div>
                                 {{#each mentionsArray}}
-                                    <p><a href="{{mentionsURL}}" target="_blank">{{mentionsString}}</a></p>
+                                    <p><a href="#" onclick="window.open('{{mentionsURL}}', '_system');">{{mentionsString}}</a></p>
                                 {{/each}}
                             </div>
                             {{#if shouldScrollMentionsList}}

@@ -1,0 +1,78 @@
+<template name="fetchItems">
+    {{> navbar }}
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>Fetch Items from CGSpace</h4>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        {{> setAPIEndpointOption }}
+                        {{#if setEndpoint }}
+                            {{> setAPIEndpointForm }}
+                        {{/if}}
+                    </div>
+                    <div class="form-group">
+                        {{> setOffsetOption }}
+                        {{#if setOffset }}
+                            {{> setOffsetForm }}
+                        {{/if}}
+                    </div>
+                    <div class="form-group label-floating">
+                        <label class="control-label" for="items-to-fetch">Items to Fetch</label>
+                        <input type="number" id="items-to-fetch" class="form-control" min="1" max="100"/>
+                        <span class="help-block small">Fetch Items (1 - 100).</span>
+                    </div>
+                    <div class="form-group">
+                        <a id="fetch-items" class="btn btn-default btn-lg btn-block btn-success btn-raised"
+                           type="button">
+                            <i class="fa fa-refresh"></i> Get Items
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="panel panel-success stats">
+                <div class="panel-heading">
+                    <h4>Quick Stats</h4>
+                </div>
+                <div class="panel-body">
+                    <p>Total Items: {{totalItems}}</p>
+                    <p>Tweeted Items: {{tweetedItems}}</p>
+                    <p>Pending Items: {{pendingItems}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template name="setAPIEndpointOption">
+    <div class="form-group">
+        <label id="set-endpoint" class="option"><i class="fa fa-square-o"></i> Set API Endpoint</label>
+    </div>
+</template>
+
+<template name="setAPIEndpointForm">
+    <div class="form-group label-floating">
+        <label class="control-label" for="endpoint">API endpoint</label>
+        <input type="text" id="endpoint" class="form-control"/>
+        <p class="help-block small">Set the CGSpace API endpoint.</p>
+    </div>
+</template>
+
+<template name="setOffsetOption">
+    <div class="form-group">
+        <label id="skip-items" class="option"><i class="fa fa-square-o"></i> Specify Items to skip</label>
+    </div>
+</template>
+
+<template name="setOffsetForm">
+    <div class="form-group label-floating">
+        <label class="control-label" for="offset">Items to Skip</label>
+        <input type="number" id="items-to-skip" class="form-control" min="0" max="49950"/>
+        <p class="help-block small">(0 - ~49,950).</p>
+    </div>
+</template>
+

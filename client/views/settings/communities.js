@@ -2,6 +2,7 @@ editHashtags = new ReactiveVar();
 editMentions = new ReactiveVar();
 selectedCommunity = new ReactiveVar();
 
+
 function getCommunityHashtagsString(community){
     return community.hashtags && community.hashtags.length > 0 ? community.hashtags.join(" ") : "N/A";
 }
@@ -10,7 +11,7 @@ function getCommunityMentionsString(community){
     return community.mentions && community.mentions.length > 0 ? community.mentions.join(" ") : "N/A";
 }
 
-Template.settings.helpers({
+Template.communities.helpers({
     communities: function(){
         return Communities.find({}, {sort: {name: 1}});
     },
@@ -19,7 +20,7 @@ Template.settings.helpers({
     }
 });
 
-Template.settings.events({
+Template.communities.events({
     "click tbody tr": function(e, t){
         editHashtags.set(null);
         if(selectedCommunity.get() == this._id){
@@ -94,9 +95,9 @@ Template.communityHashtagsEditForm.onRendered(function(){
 });
 
 Template.communityHashtagsEditForm.helpers({
-   hashtagsString: function(){
-       return getCommunityHashtagsString(this);
-   }
+    hashtagsString: function(){
+        return getCommunityHashtagsString(this);
+    }
 });
 
 Template.communityMentions.helpers({
@@ -117,3 +118,4 @@ Template.communityMentionsEditForm.helpers({
         return  getCommunityMentionsString(this);
     }
 });
+

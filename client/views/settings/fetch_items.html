@@ -8,20 +8,27 @@
                 </div>
                 <div class="panel-body">
                     <div class="form-group">
-                        {{> setAPIEndpointOption }}
-                        {{#if setEndpoint }}
-                            {{> setAPIEndpointForm }}
-                        {{/if}}
+                        {{> getLatestItemsOption }}
                     </div>
-                    <div class="form-group">
-                        {{> setOffsetOption }}
-                        {{#if setOffset }}
-                            {{> setOffsetForm }}
-                        {{/if}}
-                    </div>
+                    {{#if getLatestItems}}
+                        {{> getLatestItemsForm }}
+                    {{else}}
+                        <div class="form-group">
+                            {{> setAPIEndpointOption }}
+                            {{#if setEndpoint }}
+                                {{> setAPIEndpointForm }}
+                            {{/if}}
+                        </div>
+                        <div class="form-group">
+                            {{> setOffsetOption }}
+                            {{#if setOffset }}
+                                {{> setOffsetForm }}
+                            {{/if}}
+                        </div>
+                    {{/if}}
                     <div class="form-group label-floating">
                         <label class="control-label" for="items-to-fetch">Items to Fetch</label>
-                        <input type="number" id="items-to-fetch" class="form-control" min="1" max="100"/>
+                        <input type="number" id="items-to-fetch" class="form-control" value="1" min="1" max="100"/>
                         <span class="help-block small">Fetch Items (1 - 100).</span>
                     </div>
                     <div class="form-group">
@@ -45,6 +52,20 @@
                 </div>
             </div>
         </div>
+    </div>
+</template>
+
+<template name="getLatestItemsOption">
+    <div class="form-group">
+        <label id="get-latest-option" class="option"><i class="fa fa-square-o"></i> Get Latest Items (Latest Item ID: {{latestItemId}})</label>
+    </div>
+</template>
+
+<template name="getLatestItemsForm">
+    <div class="form-group label-floating">
+        <label class="control-label" for="endpoint">Start ID</label>
+        <input type="number" id="start-id" class="form-control" value="{{latestItemId}}"/>
+        <p class="help-block small">Set the ID to start from.</p>
     </div>
 </template>
 

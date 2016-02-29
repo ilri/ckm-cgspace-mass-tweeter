@@ -15,7 +15,7 @@ The following is an overview of how the application works:
 
 ## More Information
 
-Please visit the [wiki](https://github.com/tsega/ckm-cgspace-mass-tweeter/wiki) for this repository to know more about the system.
+Please visit the [wiki](https://github.com/ilri/ckm-cgspace-mass-tweeter/wiki) for this repository to know more about the system.
 
 # License
 

@@ -553,6 +553,7 @@ Template.showItemsWithDOIOnlyOption.events({
             checkIcon.checkItem(true);
 
             searchDOIFilter.doi = {$exists: 1};
+            searchDOIFilter.tweeted = false;
             searchFilter.set(searchDOIFilter);
             Items.set({
                 filters: searchFilter.get()
@@ -561,6 +562,7 @@ Template.showItemsWithDOIOnlyOption.events({
             checkIcon.checkItem(false);
 
             delete searchDOIFilter.doi;
+            delete searchDOIFilter.tweeted;
             searchFilter.set(searchDOIFilter);
             Items.set({
                 filters: searchFilter.get()

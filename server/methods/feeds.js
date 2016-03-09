@@ -38,7 +38,7 @@ var fetchLatestItems = function () {
             if (Items.Collection.find({itemId: item.id}).count() == 0 && topLevelCommunities.length > 0) {
                 var doc = {
                     itemId: item.id,
-                    handle: parseInt(item.handle.match(/\/([^/]*)$/)[1]),
+                    handle: parseInt(item.handle.match(/\/([^/]*)$/)[1], 10),
                     title: item.name,
                     dateIssued: moment(dateIssued.value, "YYYY-MM-DD").toDate(),
                     communities: topLevelCommunities,
@@ -106,7 +106,7 @@ Meteor.methods({
                     if (Items.Collection.find({itemId: item.id}).count() == 0 && topLevelCommunities.length > 0) {
                         var doc = {
                             itemId: item.id,
-                            handle: parseInt(item.handle.match(/\/([^/]*)$/)[1]),
+                            handle: parseInt(item.handle.match(/\/([^/]*)$/)[1], 10),
                             title: item.name,
                             dateIssued: moment(dateIssued.value, "YYYY-MM-DD").toDate(),
                             communities: topLevelCommunities,
@@ -154,7 +154,7 @@ Meteor.methods({
     },
     updateHandle: function() {
         _.each(Items.Collection.find().fetch(), function(item){
-            item.handle = typeof item.handle == 'string' ? parseInt(item.handle.match(/\/([^/]*)$/)[1]) : item.handle;
+            item.handle = typeof item.handle == 'string' ? parseInt(item.handle.match(/\/([^/]*)$/)[1], 10) : item.handle;
             Items.Collection.update({_id: item._id}, {$set: {handle: item.handle}});
         });
         console.log("Updated handles for all items!");

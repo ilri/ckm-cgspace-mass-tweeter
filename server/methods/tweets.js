@@ -2,7 +2,7 @@ intervalHandle = null;
 tweetSettings = new ReactiveVar({});
 
 itemTitle = function(item){
-    var remainingStatusLength = Meteor.settings.public.cgstweets_handle_url.length + item.handle.length;
+    var remainingStatusLength = Meteor.settings.public.cgspace_handle_url.length + item.handle.length;
     remainingStatusLength += item.hashtags ? item.hashtags.length : 0;
     remainingStatusLength += item.mentions ? item.mentions.length : 0;
     return item.title.substring(0, Meteor.settings.twitter_tweet_length - remainingStatusLength);
@@ -12,7 +12,7 @@ itemStatus = function(item){
     var status = itemTitle(item);
     status = item.hashtags ? status + " " + item.hashtags : status;
     status = item.mentions ? status + " " + item.mentions : status;
-    return status + " " + Meteor.settings.public.cgstweets_handle_url + item.handle;
+    return status + " " + Meteor.settings.public.cgspace_handle_url + item.handle;
 };
 
 tweetItem = function() {

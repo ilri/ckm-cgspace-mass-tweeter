@@ -38,7 +38,7 @@ var fetchLatestItems = function () {
             if (Items.Collection.find({itemId: item.id}).count() == 0 && topLevelCommunities.length > 0) {
                 var doc = {
                     itemId: item.id,
-                    handle: "http://hdl.handle.net/" + item.handle,
+                    handle: parseInt(item.handle.match(/\/([^/]*)$/)[1]),
                     title: item.name,
                     dateIssued: moment(dateIssued.value, "YYYY-MM-DD").toDate(),
                     communities: topLevelCommunities,
@@ -48,6 +48,7 @@ var fetchLatestItems = function () {
                 if (doi) {
                     doc.doi = doi.value;
                 }
+
                 // Add item to database
                 Items.Collection.insert(doc);
 
@@ -105,7 +106,7 @@ Meteor.methods({
                     if (Items.Collection.find({itemId: item.id}).count() == 0 && topLevelCommunities.length > 0) {
                         var doc = {
                             itemId: item.id,
-                            handle: "http://hdl.handle.net/" + item.handle,
+                            handle: parseInt(item.handle.match(/\/([^/]*)$/)[1]),
                             title: item.name,
                             dateIssued: moment(dateIssued.value, "YYYY-MM-DD").toDate(),
                             communities: topLevelCommunities,
@@ -150,6 +151,13 @@ Meteor.methods({
     latestItemId: function () {
         var latestItem = Items.Collection.findOne({}, {sort: {itemId: -1}});
         return latestItem ? latestItem.itemId : 0;
+    },
+    updateHandle: function() {
+        _.each(Items.Collection.find().fetch(), function(item){
+            item.handle = typeof item.handle == 'string' ? parseInt(item.handle.match(/\/([^/]*)$/)[1]) : item.handle;
+            Items.Collection.update({_id: item._id}, {$set: {handle: item.handle}});
+        });
+        console.log("Updated handles for all items!");
     }
 });
 

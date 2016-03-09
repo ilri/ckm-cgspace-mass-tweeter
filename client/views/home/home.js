@@ -511,6 +511,10 @@ Template.textSearchForm.events({
 
         if (!searchTerm) {
             toastr.info("Please type in your search term");
+        } else if(selectedField == "handle"){
+            Items.set({
+                filters: { $where: "/.*"+searchTerm+".*/.test(this.handle)" }
+            });
         } else {
             searchTermFilter[selectedField] = {$regex: ".*" + searchTerm + ".*", $options: '-i'};
             searchFilter.set(searchTermFilter);

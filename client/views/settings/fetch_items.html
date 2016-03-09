@@ -57,14 +57,14 @@
 
 <template name="getLatestItemsOption">
     <div class="form-group">
-        <label id="get-latest-option" class="option"><i class="fa fa-square-o"></i> Get Latest Items (Latest Item ID: {{latestItemId}})</label>
+        <label id="get-latest-option" class="option"><i class="fa fa-square-o"></i> Get Latest Items (Latest Item Handle: {{latestItemHandle}})</label>
     </div>
 </template>
 
 <template name="getLatestItemsForm">
     <div class="form-group label-floating">
         <label class="control-label" for="endpoint">Start ID</label>
-        <input type="number" id="start-id" class="form-control" value="{{latestItemId}}"/>
+        <input type="number" id="start-id" class="form-control" value="{{latestItemHandle}}"/>
         <p class="help-block small">Set the ID to start from.</p>
     </div>
 </template>

@@ -3,20 +3,20 @@ fetchSettings = new ReactiveVar({});
 
 var fetchLatestItems = function () {
     var settings = fetchSettings.get();
-    settings.latestItemId++;
+    settings.latestItemHandle++;
 
     // Set the endpoint in the format https://cgspace.cgiar.org/rest/items/ID?expand=parentCommunityList,metadata
-    var endpoint = Meteor.settings.cgspace_rest_endpoint_latest + settings.latestItemId + Meteor.settings.cgspace_rest_endpoint_latest_options;
+    var endpoint = Meteor.settings.cgspace_rest_endpoint_latest + settings.latestItemHandle + Meteor.settings.cgspace_rest_endpoint_latest_options;
 
     Meteor.http.get(endpoint, function (error, results) {
         if (error) {
-            console.log("Error while importing item with ID: " + settings.latestItemId);
+            console.log("Error while importing item with Handle: " + settings.latestItemHandle);
         }
 
         // Decrease the number of items
         settings.items--;
 
-        if (results.data) {
+        if (results.data && results.data.type == "item") {
 
             // Get the only item fetched
             var item = results.data;
@@ -132,7 +132,7 @@ Meteor.methods({
         this.unblock();
 
         var settings = {
-            latestItemId: options.latestItemId,
+            latestItemHandle: options.latestItemHandle,
             items: options.totalItems,
             totalItems: options.totalItems,
             newAdditions: 0,
@@ -148,9 +148,9 @@ Meteor.methods({
             fetchIntervalHandle = Meteor.setInterval(fetchLatestItems, Meteor.settings.cgspace_rest_endpoint_latest_delay); // Delay 37 seconds before sending
         }
     },
-    latestItemId: function () {
-        var latestItem = Items.Collection.findOne({}, {sort: {itemId: -1}});
-        return latestItem ? latestItem.itemId : 0;
+    latestItemHandle: function () {
+        var latestItem = Items.Collection.findOne({}, {sort: {handle: -1}});
+        return latestItem ? latestItem.handle : 0;
     },
     updateHandle: function() {
         _.each(Items.Collection.find().fetch(), function(item){

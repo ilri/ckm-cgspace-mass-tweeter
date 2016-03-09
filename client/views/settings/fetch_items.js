@@ -1,7 +1,7 @@
 setOffset = new ReactiveVar(false);
 setAPIEndpoint = new ReactiveVar(false);
 getLatestItems = new ReactiveVar(false);
-latestItemId = new ReactiveVar(0);
+latestItemHandle = new ReactiveVar(0);
 newAdditions = new ReactiveVar(0);
 
 fetchEvent.addListener('progress', function (userId, newAdditions, percentage) {
@@ -77,7 +77,7 @@ var fetchLatestCGSpaceItems = function () {
     var minNumberOfItems = parseInt($("#items-to-fetch").attr("min"), 10);
     var newNumberOfItems = parseInt($("#items-to-fetch").val(), 10) || 1;
     var maxNumberOfItems = parseInt($("#items-to-fetch").attr("max"), 10);
-    var startId = parseInt($("#start-id").val(), 10) || parseInt(latestItemId.get(), 10);
+    var startId = parseInt($("#start-id").val(), 10) || parseInt(latestItemHandle.get(), 10);
 
     if (newNumberOfItems < minNumberOfItems) {
         newNumberOfItems = minNumberOfItems;
@@ -86,7 +86,7 @@ var fetchLatestCGSpaceItems = function () {
     }
 
     Meteor.call("getLatestCGSpaceItems", {
-        latestItemId: startId,
+        latestItemHandle: startId,
         totalItems: newNumberOfItems
     }, function (error) {
         if (error) {
@@ -143,16 +143,16 @@ Template.fetchItems.events({
 });
 
 Template.getLatestItemsOption.helpers({
-    latestItemId: function () {
-        latestItemId.set(ReactiveMethod.call("latestItemId"));
-        return latestItemId.get();
+    latestItemHandle: function () {
+        latestItemHandle.set(ReactiveMethod.call("latestItemHandle"));
+        return latestItemHandle.get();
     }
 });
 
 Template.getLatestItemsForm.helpers({
-    latestItemId: function () {
-        latestItemId.set(ReactiveMethod.call("latestItemId"));
-        return latestItemId.get();
+    latestItemHandle: function () {
+        latestItemHandle.set(ReactiveMethod.call("latestItemHandle"));
+        return latestItemHandle.get();
     }
 });
 

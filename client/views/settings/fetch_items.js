@@ -118,15 +118,6 @@ Template.fetchItems.helpers({
     },
     setOffset: function () {
         return setOffset.get();
-    },
-    totalItems: function () {
-        return Counts.get("totalItemsCount");
-    },
-    tweetedItems: function () {
-        return Counts.get("tweetedItemsCount");
-    },
-    pendingItems: function () {
-        return Counts.get("pendingItemsCount");
     }
 });
 

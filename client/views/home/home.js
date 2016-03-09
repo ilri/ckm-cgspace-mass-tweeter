@@ -332,6 +332,9 @@ Template.item.helpers({
     },
     mentions: function () {
         return getItemMentions(this);
+    },
+    fullHandle: function() {
+        return Meteor.settings.public.cgspace_handle_url + this.handle;
     }
 });
 

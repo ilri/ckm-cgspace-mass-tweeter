@@ -7,3 +7,7 @@
 # Meteor Settings file
 settings.json
 settings_deployment.json
+settings_network.json
+
+# MUP deploy folder
+./deploy
